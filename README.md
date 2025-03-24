@@ -21,6 +21,9 @@ make run-tests
 - Cross-platform compatibility layer for KoraOS syscalls
 - Currently supports Linux with placeholders for macOS and Windows
 - Simple, clean API matching future KoraOS design
+- Implements basic file I/O syscalls (open, close, read, write, seek, ioctl)
+- Supports directory operations (mkdir, rmdir, opendir, readdir, closedir)
+- Provides symbolic link functionality (symlink, readlink)
 
 ## Documentation
 
@@ -41,5 +44,6 @@ koralayer/
 ## Current Status
 
 - Basic infrastructure is in place
-- Basic console and file I/O syscalls implemented as proof of concept
+- File I/O and directory operations implemented for Linux
+- Symbolic link operations supported
 - Only Linux implementation is complete 

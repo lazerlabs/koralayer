@@ -14,6 +14,13 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_write`](#sys_write) | 6 | Write a buffer to a file descriptor |
 | [`sys_seek`](#sys_seek) | 7 | Reposition read/write file offset |
 | [`sys_ioctl`](#sys_ioctl) | 8 | Device-specific control operations |
+| [`sys_mkdir`](#sys_mkdir) | 9 | Create a directory |
+| [`sys_rmdir`](#sys_rmdir) | 10 | Remove a directory |
+| [`sys_opendir`](#sys_opendir) | 11 | Open a directory for reading |
+| [`sys_readdir`](#sys_readdir) | 12 | Read a directory entry |
+| [`sys_closedir`](#sys_closedir) | 13 | Close a directory |
+| [`sys_symlink`](#sys_symlink) | 14 | Create a symbolic link |
+| [`sys_readlink`](#sys_readlink) | 15 | Read the target of a symbolic link |
 
 ## Common Constants
 
@@ -40,6 +47,14 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | `KORA_SUCCESS` | 0 | Operation succeeded |
 | `KORA_ERROR` | -1 | Operation failed |
 | `KORA_EOF` | -2 | End of file reached |
+
+### File Types
+| Type | Value | Description |
+|------|-------|-------------|
+| `KORA_DT_UNKNOWN` | 0 | Unknown file type |
+| `KORA_DT_REG` | 1 | Regular file |
+| `KORA_DT_DIR` | 2 | Directory |
+| `KORA_DT_SYMLINK` | 3 | Symbolic link |
 
 ## System Call Details
 
@@ -377,5 +392,276 @@ int main() {
 
 **Implementation Notes:**
 - Linux: Uses glibc `ioctl()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_mkdir
+
+**System Call Number:** 9
+
+**Prototype:**
+```c
+int sys_mkdir(const char *path);
+```
+
+**Description:**
+Creates a directory at the specified path.
+
+**Parameters:**
+- `path`: Path where the directory should be created
+
+**Return Value:**
+- `KORA_SUCCESS` (0) on success
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    int result = sys_mkdir("/tmp/test_dir");
+    if (result == KORA_SUCCESS) {
+        // Directory created successfully
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `mkdir()` function with permissions 0755
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_rmdir
+
+**System Call Number:** 10
+
+**Prototype:**
+```c
+int sys_rmdir(const char *path);
+```
+
+**Description:**
+Removes an empty directory at the specified path.
+
+**Parameters:**
+- `path`: Path to the directory to remove
+
+**Return Value:**
+- `KORA_SUCCESS` (0) on success
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    int result = sys_rmdir("/tmp/test_dir");
+    if (result == KORA_SUCCESS) {
+        // Directory removed successfully
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `rmdir()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_opendir
+
+**System Call Number:** 11
+
+**Prototype:**
+```c
+int sys_opendir(const char *path);
+```
+
+**Description:**
+Opens a directory for reading its contents.
+
+**Parameters:**
+- `path`: Path to the directory to open
+
+**Return Value:**
+- Directory handle (non-negative) on success
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    int dir = sys_opendir("/tmp");
+    if (dir >= 0) {
+        // Use the directory handle
+        sys_closedir(dir);
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `opendir()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_readdir
+
+**System Call Number:** 12
+
+**Prototype:**
+```c
+int sys_readdir(int dir, kora_dirent_t *entry);
+```
+
+**Description:**
+Reads an entry from a directory.
+
+**Parameters:**
+- `dir`: Directory handle returned by `sys_opendir`
+- `entry`: Pointer to a `kora_dirent_t` structure to be filled with the entry information
+
+**Return Value:**
+- `1` if an entry was read successfully
+- `0` if end of directory was reached
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    int dir = sys_opendir("/tmp");
+    if (dir >= 0) {
+        kora_dirent_t entry;
+        while (sys_readdir(dir, &entry) > 0) {
+            // Process entry.name and entry.type
+        }
+        sys_closedir(dir);
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `readdir()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_closedir
+
+**System Call Number:** 13
+
+**Prototype:**
+```c
+int sys_closedir(int dir);
+```
+
+**Description:**
+Closes a directory handle previously opened with `sys_opendir`.
+
+**Parameters:**
+- `dir`: Directory handle to close
+
+**Return Value:**
+- `KORA_SUCCESS` (0) on success
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    int dir = sys_opendir("/tmp");
+    if (dir >= 0) {
+        // Use the directory handle
+        sys_closedir(dir);
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `closedir()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_symlink
+
+**System Call Number:** 14
+
+**Prototype:**
+```c
+int sys_symlink(const char *target, const char *linkpath);
+```
+
+**Description:**
+Creates a symbolic link pointing to the target.
+
+**Parameters:**
+- `target`: The path that the symbolic link will point to
+- `linkpath`: The path where the symbolic link will be created
+
+**Return Value:**
+- `KORA_SUCCESS` (0) on success
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    int result = sys_symlink("/tmp/original_file", "/tmp/link_to_file");
+    if (result == KORA_SUCCESS) {
+        // Symbolic link created successfully
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `symlink()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_readlink
+
+**System Call Number:** 15
+
+**Prototype:**
+```c
+int sys_readlink(const char *path, char *buf, size_t size);
+```
+
+**Description:**
+Reads the target of a symbolic link.
+
+**Parameters:**
+- `path`: Path to the symbolic link
+- `buf`: Buffer to store the target path
+- `size`: Size of the buffer
+
+**Return Value:**
+- Length of the target path (non-negative) on success
+- `KORA_ERROR` (-1) on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    char target[256];
+    int len = sys_readlink("/tmp/link_to_file", target, sizeof(target));
+    if (len >= 0) {
+        // target now contains the path that the link points to
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `readlink()` function, ensures null-termination
 - macOS: Not yet implemented
 - Windows: Not yet implemented 
