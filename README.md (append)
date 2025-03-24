@@ -1,0 +1,54 @@
+## Building with CMake
+
+KoraLayer now uses CMake as its build system. Here's how to build the project:
+
+### Prerequisites
+
+- CMake (version 3.10 or later)
+- C compiler (GCC, Clang, or MSVC)
+- [CMocka](https://cmocka.org/) (for tests)
+
+### Building
+
+You can build using the provided build script:
+
+```bash
+# Basic build
+./build.sh
+
+# Clean build and run tests
+./build.sh --clean --test
+
+# Build in release mode
+./build.sh --release
+```
+
+Or manually using CMake:
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+### Running Tests
+
+To run the tests:
+
+```bash
+# Using the build script
+./build.sh --test
+
+# Manually
+cd build
+ctest
+
+# For verbose test output
+cd build
+CMOCKA_MESSAGE_OUTPUT=stdout ctest -V
+```
+
+### Cross-Platform Support
+
+KoraLayer supports Linux, macOS, and Windows (via MinGW or MSVC). 

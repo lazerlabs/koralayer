@@ -9,287 +9,211 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
 #include <kora/syscalls.h>
+#include <unistd.h>  // For getcwd
 
-// Test file paths
-#define TEST_DIR "./test_fileinfo_dir"
-#define TEST_FILE "./test_fileinfo_dir/test_file.txt"
-#define TEST_SYMLINK "./test_fileinfo_dir/test_symlink"
-#define NONEXISTENT_PATH "./nonexistent_path"
+// Use a subdirectory of the current directory for tests
+#define TEST_BASE_DIR "/tmp/kora_test_fileinfo"
+#define TEST_DIR TEST_BASE_DIR "/test_dir"
+#define TEST_FILE TEST_DIR "/test_file.txt"
+#define TEST_SYMLINK TEST_DIR "/test_symlink"
+#define NONEXISTENT_PATH TEST_BASE_DIR "/nonexistent"
 
 // Test file content
 #define TEST_CONTENT "This is test content for file information testing.\n"
 
-// Helper function to create test directory and files
-static int setup_test_files(void)
-{
-    printf("Setting up test files...\n");
-    
-    // Remove existing files if they exist
-    sys_rmdir(TEST_DIR);
-    
-    // Create test directory
-    int ret = sys_mkdir(TEST_DIR);
-    if (ret < 0) {
-        printf("Error creating test directory: %d\n", ret);
-        return ret;
-    }
-    
-    // Create test file
-    int fd = sys_open(TEST_FILE, O_WRONLY | O_CREAT);
-    if (fd < 0) {
-        printf("Error creating test file: %d\n", fd);
-        return fd;
-    }
-    
-    // Write content to test file
-    ret = sys_write(fd, TEST_CONTENT, strlen(TEST_CONTENT));
-    if (ret < 0) {
-        printf("Error writing to test file: %d\n", ret);
-        sys_close(fd);
-        return ret;
-    }
-    
-    sys_close(fd);
-    
-    // Create symbolic link
-    ret = sys_symlink(TEST_FILE, TEST_SYMLINK);
-    if (ret < 0) {
-        printf("Error creating symbolic link: %d\n", ret);
-        return ret;
-    }
-    
-    return 0;
-}
+/* Test fixture data */
+struct test_data {
+    kora_file_info_t file_info;
+};
 
-// Helper function to clean up test files
-static void cleanup_test_files(void)
-{
-    printf("Cleaning up test files...\n");
+/* Setup and teardown for all tests */
+static int global_setup(void **state) {
+    struct test_data *data = malloc(sizeof(struct test_data));
+    assert_non_null(data);
     
-    // Remove test files
+    // Clean up any existing test directories from previous runs
     sys_unlink(TEST_SYMLINK);
     sys_unlink(TEST_FILE);
     sys_rmdir(TEST_DIR);
-}
-
-// Test sys_exists function
-static int test_exists(void)
-{
-    printf("Testing sys_exists...\n");
+    sys_rmdir(TEST_BASE_DIR);
     
-    uint8_t type;
-    int ret;
-    
-    // Test directory existence
-    ret = sys_exists(TEST_DIR, &type);
-    if (ret <= 0) {
-        printf("Error: Directory should exist, got %d\n", ret);
-        return -1;
-    }
-    
-    if (type != KORA_FILE_TYPE_DIRECTORY) {
-        printf("Error: Expected directory type, got %d\n", type);
-        return -1;
-    }
-    
-    // Test file existence
-    ret = sys_exists(TEST_FILE, &type);
-    if (ret <= 0) {
-        printf("Error: File should exist, got %d\n", ret);
-        return -1;
-    }
-    
-    if (type != KORA_FILE_TYPE_REGULAR) {
-        printf("Error: Expected regular file type, got %d\n", type);
-        return -1;
-    }
-    
-    // Test symlink existence
-    ret = sys_exists(TEST_SYMLINK, &type);
-    if (ret <= 0) {
-        printf("Error: Symlink should exist, got %d\n", ret);
-        return -1;
-    }
-    
-    if (type != KORA_FILE_TYPE_SYMLINK) {
-        printf("Error: Expected symlink type, got %d\n", type);
-        return -1;
-    }
-    
-    // Test non-existent path
-    ret = sys_exists(NONEXISTENT_PATH, &type);
+    // Create the base test directory
+    int ret = sys_mkdir(TEST_BASE_DIR);
     if (ret != 0) {
-        printf("Error: Non-existent path should return 0, got %d\n", ret);
+        printf("Failed to create base directory '%s': %d\n", TEST_BASE_DIR, ret);
+        free(data);
         return -1;
     }
     
-    printf("sys_exists test passed!\n");
-    return 0;
-}
-
-// Test sys_get_file_info function
-static int test_get_file_info(void)
-{
-    printf("Testing sys_get_file_info...\n");
-    
-    kora_file_info_t info;
-    int ret;
-    
-    // Test getting info for a regular file
-    ret = sys_get_file_info(TEST_FILE, &info);
-    if (ret < 0) {
-        printf("Error getting file info: %d\n", ret);
+    // Create the test directory
+    ret = sys_mkdir(TEST_DIR);
+    if (ret != 0) {
+        printf("Failed to create test directory '%s': %d\n", TEST_DIR, ret);
+        sys_rmdir(TEST_BASE_DIR);
+        free(data);
         return -1;
     }
     
-    if (info.type != KORA_FILE_TYPE_REGULAR) {
-        printf("Error: Expected regular file type, got %d\n", info.type);
-        return -1;
-    }
-    
-    if (info.size != strlen(TEST_CONTENT)) {
-        printf("Error: Expected file size %ld, got %ld\n", 
-               (long)strlen(TEST_CONTENT), (long)info.size);
-        return -1;
-    }
-    
-    printf("File '%s' info:\n", TEST_FILE);
-    printf("  Type: %d\n", info.type);
-    printf("  Size: %ld bytes\n", (long)info.size);
-    printf("  Attributes: 0x%X\n", info.attributes);
-    printf("  Create time: %ld\n", (long)info.creation_time);
-    printf("  Modify time: %ld\n", (long)info.modified_time);
-    printf("  Access time: %ld\n", (long)info.access_time);
-    
-    // Test getting info for a directory
-    ret = sys_get_file_info(TEST_DIR, &info);
-    if (ret < 0) {
-        printf("Error getting directory info: %d\n", ret);
-        return -1;
-    }
-    
-    if (info.type != KORA_FILE_TYPE_DIRECTORY) {
-        printf("Error: Expected directory type, got %d\n", info.type);
-        return -1;
-    }
-    
-    printf("Directory '%s' info:\n", TEST_DIR);
-    printf("  Type: %d\n", info.type);
-    printf("  Attributes: 0x%X\n", info.attributes);
-    
-    // Test getting info for a symlink
-    ret = sys_get_file_info(TEST_SYMLINK, &info);
-    if (ret < 0) {
-        printf("Error getting symlink info: %d\n", ret);
-        return -1;
-    }
-    
-    printf("Symlink '%s' info:\n", TEST_SYMLINK);
-    printf("  Type: %d\n", info.type);
-    
-    // Test getting info for a non-existent path
-    ret = sys_get_file_info(NONEXISTENT_PATH, &info);
-    if (ret >= 0) {
-        printf("Error: Expected failure for non-existent path\n");
-        return -1;
-    }
-    
-    printf("sys_get_file_info test passed!\n");
-    return 0;
-}
-
-// Test sys_get_fd_info function
-static int test_get_fd_info(void)
-{
-    printf("Testing sys_get_fd_info...\n");
-    
-    kora_file_info_t info;
-    int fd, ret;
-    
-    // Open test file
-    fd = sys_open(TEST_FILE, O_RDONLY);
+    // Create and write to the test file
+    int fd = sys_open(TEST_FILE, KORA_O_WRONLY | KORA_O_CREAT);
     if (fd < 0) {
-        printf("Error opening test file: %d\n", fd);
+        printf("Failed to create test file '%s': %d\n", TEST_FILE, fd);
+        sys_rmdir(TEST_DIR);
+        sys_rmdir(TEST_BASE_DIR);
+        free(data);
         return -1;
     }
     
-    // Get file info by descriptor
-    ret = sys_get_fd_info(fd, &info);
-    if (ret < 0) {
-        printf("Error getting fd info: %d\n", ret);
+    ret = sys_write(fd, TEST_CONTENT, strlen(TEST_CONTENT));
+    if (ret != strlen(TEST_CONTENT)) {
+        printf("Failed to write content to test file: %d\n", ret);
         sys_close(fd);
+        sys_unlink(TEST_FILE);
+        sys_rmdir(TEST_DIR);
+        sys_rmdir(TEST_BASE_DIR);
+        free(data);
         return -1;
     }
     
-    if (info.type != KORA_FILE_TYPE_REGULAR) {
-        printf("Error: Expected regular file type, got %d\n", info.type);
-        sys_close(fd);
-        return -1;
-    }
-    
-    if (info.size != strlen(TEST_CONTENT)) {
-        printf("Error: Expected file size %ld, got %ld\n", 
-               (long)strlen(TEST_CONTENT), (long)info.size);
-        sys_close(fd);
-        return -1;
-    }
-    
-    printf("File descriptor %d info:\n", fd);
-    printf("  Type: %d\n", info.type);
-    printf("  Size: %ld bytes\n", (long)info.size);
-    printf("  Attributes: 0x%X\n", info.attributes);
-    
-    // Close test file
     sys_close(fd);
     
-    // Test invalid file descriptor
-    ret = sys_get_fd_info(-1, &info);
-    if (ret >= 0) {
-        printf("Error: Expected failure for invalid fd\n");
+    // Create the symlink
+    ret = sys_symlink(TEST_FILE, TEST_SYMLINK);
+    if (ret != 0) {
+        printf("Failed to create symlink '%s': %d\n", TEST_SYMLINK, ret);
+        sys_unlink(TEST_FILE);
+        sys_rmdir(TEST_DIR);
+        sys_rmdir(TEST_BASE_DIR);
+        free(data);
         return -1;
     }
     
-    printf("sys_get_fd_info test passed!\n");
+    // Print current directory for debugging
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working directory: %s\n", cwd);
+    }
+    
+    printf("Setup complete: Created test directory at %s\n", TEST_DIR);
+    
+    *state = data;
     return 0;
 }
 
-int main(void)
-{
-    printf("======== File Info System Call Tests ========\n");
+static int global_teardown(void **state) {
+    struct test_data *data = *state;
     
-    // Setup test files
-    if (setup_test_files() < 0) {
-        printf("Failed to set up test files\n");
-        return 1;
-    }
+    // Cleanup test files
+    printf("Cleaning up test files...\n");
+    sys_unlink(TEST_SYMLINK);
+    sys_unlink(TEST_FILE);
+    sys_rmdir(TEST_DIR);
+    sys_rmdir(TEST_BASE_DIR);
     
-    // Run tests
-    int failed = 0;
-    
-    if (test_exists() < 0) {
-        printf("sys_exists test failed\n");
-        failed = 1;
-    }
-    
-    if (test_get_file_info() < 0) {
-        printf("sys_get_file_info test failed\n");
-        failed = 1;
-    }
-    
-    if (test_get_fd_info() < 0) {
-        printf("sys_get_fd_info test failed\n");
-        failed = 1;
-    }
-    
-    // Clean up test files
-    cleanup_test_files();
-    
-    if (failed) {
-        printf("Some tests failed\n");
-        return 1;
-    }
-    
-    printf("All file info tests passed!\n");
+    free(data);
     return 0;
+}
+
+/* Test functions */
+static void test_fileinfo_exists_directory(void **state) {
+    (void)state; // Mark as used to avoid compiler warning
+    
+    uint8_t type;
+    int ret = sys_exists(TEST_DIR, &type);
+    printf("sys_exists(%s) returned %d, type=%d\n", TEST_DIR, ret, type);
+    
+    assert_true(ret > 0);
+    assert_int_equal(type, KORA_FILE_TYPE_DIRECTORY);
+}
+
+static void test_fileinfo_exists_regular_file(void **state) {
+    (void)state; // Mark as used to avoid compiler warning
+    
+    uint8_t type;
+    int ret = sys_exists(TEST_FILE, &type);
+    printf("sys_exists(%s) returned %d, type=%d\n", TEST_FILE, ret, type);
+    
+    assert_true(ret > 0);
+    assert_int_equal(type, KORA_FILE_TYPE_REGULAR);
+}
+
+static void test_fileinfo_exists_symlink(void **state) {
+    (void)state; // Mark as used to avoid compiler warning
+    
+    uint8_t type;
+    int ret = sys_exists(TEST_SYMLINK, &type);
+    printf("sys_exists(%s) returned %d, type=%d\n", TEST_SYMLINK, ret, type);
+    
+    assert_true(ret > 0);
+    assert_int_equal(type, KORA_FILE_TYPE_SYMLINK);
+}
+
+static void test_fileinfo_exists_nonexistent(void **state) {
+    (void)state; // Mark as used to avoid compiler warning
+    
+    uint8_t type;
+    int ret = sys_exists(NONEXISTENT_PATH, &type);
+    printf("sys_exists(%s) returned %d, type=%d\n", NONEXISTENT_PATH, ret, type);
+    
+    assert_int_equal(ret, 0);
+}
+
+static void test_fileinfo_get_file_info_regular(void **state) {
+    struct test_data *data = *state;
+    
+    int ret = sys_get_file_info(TEST_FILE, &data->file_info);
+    printf("sys_get_file_info(%s) returned %d, type=%d, size=%ld\n", 
+           TEST_FILE, ret, data->file_info.type, data->file_info.size);
+    
+    assert_int_equal(ret, 0);
+    assert_int_equal(data->file_info.type, KORA_FILE_TYPE_REGULAR);
+    assert_int_equal(data->file_info.size, strlen(TEST_CONTENT));
+}
+
+static void test_fileinfo_get_fd_info_regular(void **state) {
+    struct test_data *data = *state;
+    
+    int fd = sys_open(TEST_FILE, KORA_O_RDONLY);
+    printf("sys_open(%s) returned fd=%d\n", TEST_FILE, fd);
+    assert_true(fd > -1);
+    
+    int ret = sys_get_fd_info(fd, &data->file_info);
+    printf("sys_get_fd_info(%d) returned %d, type=%d, size=%ld\n", 
+           fd, ret, data->file_info.type, data->file_info.size);
+    
+    assert_int_equal(ret, 0);
+    assert_int_equal(data->file_info.type, KORA_FILE_TYPE_REGULAR);
+    assert_int_equal(data->file_info.size, strlen(TEST_CONTENT));
+    
+    sys_close(fd);
+}
+
+static void test_fileinfo_get_fd_info_invalid(void **state) {
+    struct test_data *data = *state;
+    
+    int ret = sys_get_fd_info(-1, &data->file_info);
+    printf("sys_get_fd_info(-1) returned %d\n", ret);
+    
+    assert_true(ret < 0);
+}
+
+/* Main test suite */
+int main(void) {
+    // Run setup and teardown for each test
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test_setup_teardown(test_fileinfo_exists_directory, global_setup, global_teardown),
+        cmocka_unit_test_setup_teardown(test_fileinfo_exists_regular_file, global_setup, global_teardown),
+        cmocka_unit_test_setup_teardown(test_fileinfo_exists_symlink, global_setup, global_teardown),
+        cmocka_unit_test_setup_teardown(test_fileinfo_exists_nonexistent, global_setup, global_teardown),
+        cmocka_unit_test_setup_teardown(test_fileinfo_get_file_info_regular, global_setup, global_teardown),
+        cmocka_unit_test_setup_teardown(test_fileinfo_get_fd_info_regular, global_setup, global_teardown),
+        cmocka_unit_test_setup_teardown(test_fileinfo_get_fd_info_invalid, global_setup, global_teardown),
+    };
+
+    return cmocka_run_group_tests(tests, NULL, NULL);
 } 

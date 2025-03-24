@@ -1,7 +1,11 @@
 /**
- * Directory operations test for KoraLayer
+ * Directory operations test for KoraLayer using CMocka
  */
 
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
 #include <kora/syscalls.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,233 +18,167 @@
 #define TEST_FILE "/tmp/kora_test_dir/test_file"
 #define TEST_SYMLINK "/tmp/kora_test_dir/test_symlink"
 
-/**
- * Test mkdir and rmdir functionality
- */
-void test_mkdir_rmdir(void) {
-    int result;
+/* Test fixture data structure */
+struct test_data {
+    int dir_handle;     // Directory handle for opendir tests
+    int file_handle;    // File handle for file tests
+    char buffer[256];   // Buffer for reading/writing 
+};
 
-    printf("Testing mkdir and rmdir...\n");
-
-    // Create test directory
-    result = sys_mkdir(TEST_DIR);
-    if (result != KORA_SUCCESS) {
-        printf("FAIL: sys_mkdir(%s) returned %d (errno: %d, %s)\n",
-            TEST_DIR, result, errno, strerror(errno));
-        exit(1);
+/* Test fixture setup and teardown */
+static int setup(void **state) {
+    // Allocate test data
+    struct test_data *data = malloc(sizeof(struct test_data));
+    if (data == NULL) {
+        return -1;
     }
-    printf("SUCCESS: Created directory %s\n", TEST_DIR);
+    memset(data, 0, sizeof(struct test_data));
+    
+    // Clean up any left-over test directories from previous runs
+    sys_unlink(TEST_SYMLINK);  
+    sys_unlink(TEST_FILE);
+    sys_rmdir(TEST_SUBDIR);
+    sys_rmdir(TEST_DIR);
+    
+    // Create base test directory
+    int result = sys_mkdir(TEST_DIR);
+    if (result != KORA_SUCCESS) {
+        free(data);
+        return -1;
+    }
+    
+    // Set the test fixture data
+    *state = data;
+    return 0;
+}
+
+static int teardown(void **state) {
+    struct test_data *data = *state;
+    
+    // Close any open handles
+    if (data->dir_handle >= 0) {
+        sys_closedir(data->dir_handle);
+    }
+    
+    if (data->file_handle >= 0) {
+        sys_close(data->file_handle);
+    }
+    
+    // Clean up test directories
+    sys_unlink(TEST_SYMLINK);
+    sys_unlink(TEST_FILE);
+    sys_rmdir(TEST_SUBDIR);
+    sys_rmdir(TEST_DIR);
+    
+    // Free test data
+    free(data);
+    
+    return 0;
+}
+
+/* Test mkdir and rmdir functionality */
+static void test_mkdir_rmdir(void **state) {
+    int result;
+    (void)state; // Not used here
+
 
     // Create subdirectory
     result = sys_mkdir(TEST_SUBDIR);
-    if (result != KORA_SUCCESS) {
-        printf("FAIL: sys_mkdir(%s) returned %d\n", TEST_SUBDIR, result);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Created subdirectory %s\n", TEST_SUBDIR);
-
+    assert_int_equal(result, KORA_SUCCESS);
+    
     // Remove subdirectory
     result = sys_rmdir(TEST_SUBDIR);
-    if (result != KORA_SUCCESS) {
-        printf("FAIL: sys_rmdir(%s) returned %d\n", TEST_SUBDIR, result);
-        sys_rmdir(TEST_SUBDIR);  // Try again
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Removed subdirectory %s\n", TEST_SUBDIR);
-
-    // Don't remove the main test directory yet as we'll use it for other tests
+    assert_int_equal(result, KORA_SUCCESS);
 }
 
-/**
- * Test directory reading functionality
- */
-void test_directory_reading(void) {
-    int dir;
+/* Test directory reading functionality */
+static void test_directory_reading(void **state) {
+    struct test_data *data = *state;
     int result;
     kora_dirent_t entry;
     int found_dot = 0;
     int found_dotdot = 0;
     int found_test_file = 0;
 
-    printf("Testing directory reading...\n");
-
     // Create a test file
-    int fd = sys_open(TEST_FILE, KORA_O_CREAT | KORA_O_WRONLY);
-    if (fd < 0) {
-        printf("FAIL: Could not create test file %s (errno: %d, %s)\n", 
-               TEST_FILE, errno, strerror(errno));
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
+    data->file_handle = sys_open(TEST_FILE, KORA_O_CREAT | KORA_O_WRONLY);
+    assert_true(data->file_handle >= 0);
     
-    sys_write(fd, "test", 4);
-    sys_close(fd);
-    printf("Created test file for directory reading test\n");
-
+    result = sys_write(data->file_handle, "test", 4);
+    assert_int_equal(result, 4);
+    
+    sys_close(data->file_handle);
+    data->file_handle = -1;
+    
     // Open directory
-    dir = sys_opendir(TEST_DIR);
-    if (dir < 0) {
-        printf("FAIL: sys_opendir(%s) returned %d (errno: %d, %s)\n", 
-               TEST_DIR, dir, errno, strerror(errno));
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Opened directory %s\n", TEST_DIR);
-
+    data->dir_handle = sys_opendir(TEST_DIR);
+    assert_true(data->dir_handle >= 0);
+    
     // Read directory entries
-    while ((result = sys_readdir(dir, &entry)) > 0) {
+    while ((result = sys_readdir(data->dir_handle, &entry)) > 0) {
         printf("Found directory entry: %s (type: %d)\n", entry.name, entry.type);
         
         if (strcmp(entry.name, ".") == 0) {
             found_dot = 1;
-            if (entry.type != KORA_DT_DIR) {
-                printf("FAIL: . is not marked as a directory\n");
-            }
+            assert_int_equal(entry.type, KORA_DT_DIR);
         }
         else if (strcmp(entry.name, "..") == 0) {
             found_dotdot = 1;
-            if (entry.type != KORA_DT_DIR) {
-                printf("FAIL: .. is not marked as a directory\n");
-            }
+            assert_int_equal(entry.type, KORA_DT_DIR);
         }
         else if (strcmp(entry.name, "test_file") == 0) {
             found_test_file = 1;
-            if (entry.type != KORA_DT_REG) {
-                printf("FAIL: test_file is not marked as a regular file\n");
-            }
+            assert_int_equal(entry.type, KORA_DT_REG);
         }
     }
     
-    if (result < 0) {
-        printf("FAIL: sys_readdir returned error %d (errno: %d, %s)\n", 
-               result, errno, strerror(errno));
-        sys_closedir(dir);
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-
     // Check that we found all expected entries
-    if (!found_dot || !found_dotdot || !found_test_file) {
-        printf("FAIL: Did not find all expected directory entries\n");
-        printf("  . found: %d\n", found_dot);
-        printf("  .. found: %d\n", found_dotdot);
-        printf("  test_file found: %d\n", found_test_file);
-        sys_closedir(dir);
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Found all expected directory entries\n");
-
+    assert_true(found_dot && found_dotdot && found_test_file);
+    
     // Close directory
-    result = sys_closedir(dir);
-    if (result != KORA_SUCCESS) {
-        printf("FAIL: sys_closedir returned %d (errno: %d, %s)\n", 
-               result, errno, strerror(errno));
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Closed directory\n");
+    result = sys_closedir(data->dir_handle);
+    assert_int_equal(result, KORA_SUCCESS);
+    data->dir_handle = -1;
     
-    // Clean up test file
-    if (sys_rmdir(TEST_FILE) == KORA_SUCCESS) {
-        printf("FAIL: sys_rmdir succeeded on a file!\n");
-    } else {
-        printf("SUCCESS: sys_rmdir correctly failed on a non-directory\n");
-    }
-    
-    // Remove the test file
-    if (unlink(TEST_FILE) != 0) {
-        printf("Warning: Failed to remove test file: %s\n", strerror(errno));
-    }
+    // Make sure rmdir fails on a file (expected behavior)
+    result = sys_rmdir(TEST_FILE);
+    assert_true(result != KORA_SUCCESS);
 }
 
-/**
- * Test symlink and readlink functionality
- */
-void test_symlink(void) {
+/* Test symlink and readlink functionality */
+static void test_symlink(void **state) {
+    struct test_data *data = *state;
     int result;
-    char buf[256];
-
-    printf("Testing symbolic links...\n");
 
     // Create a test file
-    int fd = sys_open(TEST_FILE, KORA_O_CREAT | KORA_O_WRONLY);
-    if (fd < 0) {
-        printf("FAIL: Could not create test file %s\n", TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    sys_write(fd, "test", 4);
-    sys_close(fd);
-    printf("Created test file for symlink test\n");
-
+    data->file_handle = sys_open(TEST_FILE, KORA_O_CREAT | KORA_O_WRONLY);
+    assert_true(data->file_handle >= 0);
+    
+    result = sys_write(data->file_handle, "test", 4);
+    assert_int_equal(result, 4);
+    
+    sys_close(data->file_handle);
+    data->file_handle = -1;
+    
     // Create symlink
     result = sys_symlink(TEST_FILE, TEST_SYMLINK);
-    if (result != KORA_SUCCESS) {
-        printf("FAIL: sys_symlink returned %d\n", result);
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Created symlink %s -> %s\n", TEST_SYMLINK, TEST_FILE);
-
+    assert_int_equal(result, KORA_SUCCESS);
+    
     // Read symlink
-    result = sys_readlink(TEST_SYMLINK, buf, sizeof(buf));
-    if (result < 0) {
-        printf("FAIL: sys_readlink returned %d\n", result);
-        unlink(TEST_SYMLINK);
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
+    result = sys_readlink(TEST_SYMLINK, data->buffer, sizeof(data->buffer));
+    assert_true(result >= 0);
     
-    printf("Symlink target: %s\n", buf);
-    
-    if (strcmp(buf, TEST_FILE) != 0) {
-        printf("FAIL: Symlink target does not match\n");
-        printf("  Expected: %s\n", TEST_FILE);
-        printf("  Got: %s\n", buf);
-        unlink(TEST_SYMLINK);
-        unlink(TEST_FILE);
-        sys_rmdir(TEST_DIR);
-        exit(1);
-    }
-    printf("SUCCESS: Symlink target matches\n");
-
-    // Clean up
-    if (unlink(TEST_SYMLINK) != 0) {
-        printf("Warning: Failed to remove symlink: %s\n", strerror(errno));
-    }
-    if (unlink(TEST_FILE) != 0) {
-        printf("Warning: Failed to remove test file: %s\n", strerror(errno));
-    }
+    // Verify symlink target
+    assert_string_equal(data->buffer, TEST_FILE);
 }
 
-/**
- * Main test function
- */
+/* Main test suite */
 int main(void) {
-    printf("=== KoraLayer Directory Operations Test ===\n");
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test_setup_teardown(test_mkdir_rmdir, setup, teardown),
+        cmocka_unit_test_setup_teardown(test_directory_reading, setup, teardown),
+        cmocka_unit_test_setup_teardown(test_symlink, setup, teardown),
+    };
 
-    // Clean up any left-over test directories from previous runs
-    rmdir(TEST_SUBDIR);  // Ignore errors
-    unlink(TEST_SYMLINK);  // Ignore errors
-    unlink(TEST_FILE);  // Ignore errors
-    rmdir(TEST_DIR);  // Ignore errors
-
-    test_mkdir_rmdir();
-    test_directory_reading();
-    test_symlink();
-
-    // Final cleanup
-    sys_rmdir(TEST_DIR);
-
-    printf("=== All directory tests passed! ===\n");
-    return 0;
+    return cmocka_run_group_tests(tests, NULL, NULL);
 } 

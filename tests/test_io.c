@@ -1,191 +1,158 @@
+/**
+ * I/O operations test for KoraLayer using CMocka
+ */
+
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
 #include <kora/syscalls.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define TEST_FILE "test_file.txt"
+#define TEST_FILE "/tmp/kora_test_io.txt"
 #define TEST_DATA "Hello, KoraOS!\n"
 #define BUFFER_SIZE 128
 
-/* Test helper functions */
-void print_result(const char *test_name, int passed) {
-    printf("%-30s: %s\n", test_name, passed ? "PASSED" : "FAILED");
-}
-
-int test_putc_getc() {
-    int result;
-    int passed = 1;
-    char simulated_input = 'A';  // Simulate typing the character 'A'
-    
-    printf("\nTesting sys_putc and sys_getc...\n");
-    
-    /* Simulate input by writing to stdin */
-    // Here we would normally use a method to place 'simulated_input' into stdin,
-    // but since we cannot manipulate stdin directly in this context, we will
-    // directly use the simulated input for testing.
-    
-    /* Instead of calling sys_getc(), we directly use the simulated input */
-    int c = simulated_input;  // Simulate getting the character from stdin
-    printf("Simulated input character: %c\n", c);
-    
-    // Echo it back using sys_putc
-    printf("\nYou typed: ");
-    result = sys_putc((char)c);
-    sys_putc('\n');
-    
-    if (result != KORA_SUCCESS) {
-        printf("sys_putc failed\n");
-        passed = 0;
-    }
-    
-    return passed;
-    
-    /* Echo it back using sys_putc */
-    printf("\nYou typed: ");
-    result = sys_putc((char)c);
-    sys_putc('\n');
-    
-    if (result != KORA_SUCCESS) {
-        printf("sys_putc failed\n");
-        passed = 0;
-    }
-    
-    return passed;
-}
-
-int test_file_io() {
-    int fd, result;
+/* Test fixture data structure */
+struct test_data {
+    int file_handle;
     char buffer[BUFFER_SIZE];
-    int passed = 1;
+};
+
+/* Test fixture setup and teardown */
+static int setup(void **state) {
+    // Allocate test data
+    struct test_data *data = malloc(sizeof(struct test_data));
+    if (data == NULL) {
+        return -1;
+    }
     
-    printf("\nTesting file I/O syscalls...\n");
+    // Initialize test data
+    memset(data, 0, sizeof(struct test_data));
+    data->file_handle = -1;
+    
+    // Clean up any existing test file
+    sys_unlink(TEST_FILE);
+    
+    // Set the test fixture data
+    *state = data;
+    return 0;
+}
+
+static int teardown(void **state) {
+    struct test_data *data = *state;
+    
+    // Close file if open
+    if (data->file_handle >= 0) {
+        sys_close(data->file_handle);
+    }
+    
+    // Clean up test file
+    sys_unlink(TEST_FILE);
+    
+    // Free test data
+    free(data);
+    
+    return 0;
+}
+
+/* Test putc and getc functionality */
+static void test_putc(void **state) {
+    int result;
+    (void)state; // Not used here
+
+    // Test putc with a character
+    result = sys_putc('A');
+    assert_int_equal(result, KORA_SUCCESS);
+    
+    // Test putc with a newline
+    result = sys_putc('\n');
+    assert_int_equal(result, KORA_SUCCESS);
+}
+
+/* Test file I/O functionality */
+static void test_file_io(void **state) {
+    struct test_data *data = *state;
+    int result;
     
     /* Test sys_open with create */
-    fd = sys_open(TEST_FILE, KORA_O_WRONLY | KORA_O_CREAT | KORA_O_TRUNC);
-    if (fd < 0) {
-        printf("sys_open for writing failed\n");
-        return 0;
-    }
+    data->file_handle = sys_open(TEST_FILE, KORA_O_WRONLY | KORA_O_CREAT | KORA_O_TRUNC);
+    assert_true(data->file_handle >= 0);
     
     /* Test sys_write */
-    result = sys_write(fd, TEST_DATA, strlen(TEST_DATA));
-    if (result != strlen(TEST_DATA)) {
-        printf("sys_write failed: wrote %d bytes, expected %zu\n", 
-               result, strlen(TEST_DATA));
-        passed = 0;
-    }
+    result = sys_write(data->file_handle, TEST_DATA, strlen(TEST_DATA));
+    assert_int_equal(result, strlen(TEST_DATA));
     
     /* Test sys_close */
-    result = sys_close(fd);
-    if (result != KORA_SUCCESS) {
-        printf("sys_close failed\n");
-        passed = 0;
-    }
+    result = sys_close(data->file_handle);
+    assert_int_equal(result, KORA_SUCCESS);
+    data->file_handle = -1;
     
     /* Test sys_open for reading */
-    fd = sys_open(TEST_FILE, KORA_O_RDONLY);
-    if (fd < 0) {
-        printf("sys_open for reading failed\n");
-        return 0;
-    }
+    data->file_handle = sys_open(TEST_FILE, KORA_O_RDONLY);
+    assert_true(data->file_handle >= 0);
     
     /* Test sys_read */
-    memset(buffer, 0, BUFFER_SIZE);
-    result = sys_read(fd, buffer, BUFFER_SIZE - 1);
-    if (result < 0) {
-        printf("sys_read failed\n");
-        passed = 0;
-    } else if (strcmp(buffer, TEST_DATA) != 0) {
-        printf("Read data mismatch\n");
-        printf("Expected: '%s'\n", TEST_DATA);
-        printf("Got:      '%s'\n", buffer);
-        passed = 0;
-    }
+    memset(data->buffer, 0, BUFFER_SIZE);
+    result = sys_read(data->file_handle, data->buffer, BUFFER_SIZE - 1);
+    assert_true(result >= 0);
+    assert_string_equal(data->buffer, TEST_DATA);
     
     /* Test sys_seek */
-    result = sys_seek(fd, 0, KORA_SEEK_SET);
-    if (result != 0) {
-        printf("sys_seek to beginning failed\n");
-        passed = 0;
-    }
+    result = sys_seek(data->file_handle, 0, KORA_SEEK_SET);
+    assert_int_equal(result, 0);
     
     /* Read first 5 bytes after seek */
-    memset(buffer, 0, BUFFER_SIZE);
-    result = sys_read(fd, buffer, 5);
-    if (result != 5 || strncmp(buffer, "Hello", 5) != 0) {
-        printf("sys_read after seek failed\n");
-        passed = 0;
-    }
+    memset(data->buffer, 0, BUFFER_SIZE);
+    result = sys_read(data->file_handle, data->buffer, 5);
+    assert_int_equal(result, 5);
+    data->buffer[5] = '\0'; // Ensure null termination
+    assert_string_equal(data->buffer, "Hello");
     
     /* Test sys_close again */
-    result = sys_close(fd);
-    if (result != KORA_SUCCESS) {
-        printf("Second sys_close failed\n");
-        passed = 0;
-    }
-    
-    return passed;
+    result = sys_close(data->file_handle);
+    assert_int_equal(result, KORA_SUCCESS);
+    data->file_handle = -1;
 }
 
-int test_ioctl() {
-    /* Test a simple terminal IOCTL to get window size */
+/* Test ioctl functionality (with simple terminal check) */
+static void test_ioctl(void **state) {
     int fd, result;
+    (void)state; // Not used here
+
     struct winsize {
         unsigned short ws_row;
         unsigned short ws_col;
         unsigned short ws_xpixel;
         unsigned short ws_ypixel;
     } ws;
-    int passed = 1;
-    
-    printf("\nTesting sys_ioctl...\n");
     
     /* Open stdin file descriptor */
     fd = 0; /* stdin */
     
     /* Try to get terminal window size using TIOCGWINSZ ioctl */
-    /* Note: This is just a simple test, might not work in all environments */
     result = sys_ioctl(fd, 0x5413 /* TIOCGWINSZ */, &ws);
     
-    /* We don't require this to pass as it depends on whether stdin is a terminal */
+    /* We don't fail the test if this fails, as it depends on the environment */
     if (result == KORA_SUCCESS) {
         printf("Terminal size: %d rows x %d columns\n", ws.ws_row, ws.ws_col);
     } else {
         printf("ioctl for window size failed (this is expected if not running in a terminal)\n");
     }
     
-    /* Always return success as this test is informational */
-    return passed;
+    /* This test is essentially a no-op for validation purposes */
+    assert_true(1);
 }
 
-int main() {
-    int tests_passed = 0;
-    int tests_total = 0;
-    int test_result;
-    
-    printf("KoraOS I/O System Call Tests\n");
-    printf("============================\n");
-    
-    /* Test 1: putc/getc */
-    tests_total++;
-    test_result = test_putc_getc();
-    print_result("putc/getc test", test_result);
-    tests_passed += test_result;
-    
-    /* Test 2: File I/O */
-    tests_total++;
-    test_result = test_file_io();
-    print_result("File I/O test", test_result);
-    tests_passed += test_result;
-    
-    /* Test 3: ioctl */
-    tests_total++;
-    test_result = test_ioctl();
-    print_result("ioctl test", test_result);
-    tests_passed += test_result;
-    
-    /* Print summary */
-    printf("\nSummary: %d/%d tests passed\n", tests_passed, tests_total);
-    
-    return (tests_passed == tests_total) ? 0 : 1;
+/* Main test suite */
+int main(void) {
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test_setup_teardown(test_putc, setup, teardown),
+        cmocka_unit_test_setup_teardown(test_file_io, setup, teardown),
+        cmocka_unit_test_setup_teardown(test_ioctl, setup, teardown),
+    };
+
+    return cmocka_run_group_tests(tests, NULL, NULL);
 } 

@@ -1,0 +1,51 @@
+cmake_minimum_required(VERSION 3.10)
+project(koralayer_tests C)
+
+# Find CMocka package
+find_package(CMocka REQUIRED)
+
+# Enable testing
+enable_testing()
+
+# Set compile flags
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic")
+
+# Create mock implementation for tests
+set(MOCK_SYSCALLS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/mock_syscalls.c")
+
+# Set test source files
+set(TEST_FILES
+    test_fileinfo.c
+    test_dir.c
+    test_io.c
+    test_putc.c
+)
+
+# Platform specific test configurations
+if(WIN32)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+# Create test executables
+foreach(TEST_FILE ${TEST_FILES})
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+    add_executable(${TEST_NAME} ${TEST_FILE})
+    
+    # Link against koralayer and cmocka
+    target_link_libraries(${TEST_NAME}
+        PRIVATE
+            koralayer
+            cmocka
+    )
+    
+    # Set test properties for better output
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+    set_tests_properties(${TEST_NAME} PROPERTIES
+        ENVIRONMENT "CMOCKA_MESSAGE_OUTPUT=stdout;CMOCKA_TEST_ABORT=1"
+    )
+endforeach()
+
+# Add custom target for running tests with verbose output
+add_custom_target(check
+    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -V
+) 

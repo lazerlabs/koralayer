@@ -1,21 +1,33 @@
-#include <kora/syscalls.h>
-#include <stdio.h>
+/**
+ * Test for putc syscall using CMocka
+ */
 
-int main() {
-    printf("Testing sys_putc: ");
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+#include <kora/syscalls.h>
+
+/* Test putc functionality */
+static void test_putc_syscall(void **state) {
+    (void)state; // Mark as used to avoid compiler warning
     
-    int result = sys_putc('A');
-    if (result != KORA_SUCCESS) {
-        printf("FAILED\n");
-        return 1;
-    }
+    int result;
     
+    // Test writing 'A'
+    result = sys_putc('A');
+    assert_int_equal(result, KORA_SUCCESS);
+    
+    // Test writing newline
     result = sys_putc('\n');
-    if (result != KORA_SUCCESS) {
-        printf("FAILED\n");
-        return 1;
-    }
-    
-    printf("SUCCESS\n");
-    return 0;
+    assert_int_equal(result, KORA_SUCCESS);
+}
+
+/* Main test suite */
+int main(void) {
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_putc_syscall),
+    };
+
+    return cmocka_run_group_tests(tests, NULL, NULL);
 } 
