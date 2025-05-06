@@ -463,4 +463,4 @@ int macos_sys_unlink(const char *path)
     return 0;
 }
 
-#endif // KORA_PLATFORM_MACOS 
+#endif // KORA_PLATFORM_MACOS

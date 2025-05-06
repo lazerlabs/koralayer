@@ -45,4 +45,4 @@ int windows_sys_ioctl(int fd, unsigned long request, void *arg) {
     /* TODO: Implement Windows version */
     return KORA_ERROR;
 }
-#endif 
+#endif
