@@ -16,6 +16,13 @@
 #include <kora/syscalls.h>
 #include <unistd.h>  // For getcwd
 
+// Platform-specific format specifier for uint64_t
+#ifdef __APPLE__
+#define PRI_UINT64 "llu"
+#else
+#define PRI_UINT64 "lu"
+#endif
+
 // Use a subdirectory of the current directory for tests
 #define TEST_BASE_DIR "/tmp/kora_test_fileinfo"
 #define TEST_DIR TEST_BASE_DIR "/test_dir"
@@ -167,8 +174,8 @@ static void test_fileinfo_get_file_info_regular(void **state) {
     struct test_data *data = *state;
     
     int ret = sys_get_file_info(TEST_FILE, &data->file_info);
-    printf("sys_get_file_info(%s) returned %d, type=%d, size=%llu\n", 
-           TEST_FILE, ret, data->file_info.type, data->file_info.size);
+    printf("sys_get_file_info(%s) returned %d, type=%d, size=%" PRI_UINT64 "\n", 
+        TEST_FILE, ret, data->file_info.type, data->file_info.size);
     
     assert_int_equal(ret, 0);
     assert_int_equal(data->file_info.type, KORA_FILE_TYPE_REGULAR);
@@ -183,8 +190,8 @@ static void test_fileinfo_get_fd_info_regular(void **state) {
     assert_true(fd > -1);
     
     int ret = sys_get_fd_info(fd, &data->file_info);
-    printf("sys_get_fd_info(%d) returned %d, type=%d, size=%llu\n", 
-           fd, ret, data->file_info.type, data->file_info.size);
+    printf("sys_get_fd_info(%d) returned %d, type=%d, size=%" PRI_UINT64 "\n",
+        fd, ret, data->file_info.type, data->file_info.size);
     
     assert_int_equal(ret, 0);
     assert_int_equal(data->file_info.type, KORA_FILE_TYPE_REGULAR);
