@@ -3,3 +3,36 @@ build/
 lib/
 test_file.txt
 .cursor/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+Testing/
+
+# Compiled files
+*.a
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Test executables
+tests/test_*
+!tests/test_*.c
+
+# Generated files
+compile_commands.json
+.cmake/
+_deps/
+
+# Editor and OS specific files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~

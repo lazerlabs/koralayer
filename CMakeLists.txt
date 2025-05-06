@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(koralayer C)
 
+# Add our custom cmake modules path
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 # Set C standard
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -24,8 +27,10 @@ elseif(WIN32)
     add_compile_definitions(KORA_PLATFORM_WINDOWS)
 endif()
 
-# Add include directories globally
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+# Set include directories
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 # Add source files
 file(GLOB COMMON_SOURCES 

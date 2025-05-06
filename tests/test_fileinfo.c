@@ -167,7 +167,7 @@ static void test_fileinfo_get_file_info_regular(void **state) {
     struct test_data *data = *state;
     
     int ret = sys_get_file_info(TEST_FILE, &data->file_info);
-    printf("sys_get_file_info(%s) returned %d, type=%d, size=%ld\n", 
+    printf("sys_get_file_info(%s) returned %d, type=%d, size=%llu\n", 
            TEST_FILE, ret, data->file_info.type, data->file_info.size);
     
     assert_int_equal(ret, 0);
@@ -183,7 +183,7 @@ static void test_fileinfo_get_fd_info_regular(void **state) {
     assert_true(fd > -1);
     
     int ret = sys_get_fd_info(fd, &data->file_info);
-    printf("sys_get_fd_info(%d) returned %d, type=%d, size=%ld\n", 
+    printf("sys_get_fd_info(%d) returned %d, type=%d, size=%llu\n", 
            fd, ret, data->file_info.type, data->file_info.size);
     
     assert_int_equal(ret, 0);

@@ -10,6 +10,12 @@ enable_testing()
 # Set compile flags
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic")
 
+# Ensure tests can find the required header files
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include
+    ${CMOCKA_INCLUDE_DIRS}
+)
+
 # Create mock implementation for tests
 set(MOCK_SYSCALLS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/mock_syscalls.c")
 
@@ -19,6 +25,7 @@ set(TEST_FILES
     test_dir.c
     test_io.c
     test_putc.c
+    test_unlink.c
 )
 
 # Platform specific test configurations
@@ -35,7 +42,14 @@ foreach(TEST_FILE ${TEST_FILES})
     target_link_libraries(${TEST_NAME}
         PRIVATE
             koralayer
-            cmocka
+            ${CMOCKA_LIBRARIES}
+    )
+    
+    # Set include directories explicitly for each test
+    target_include_directories(${TEST_NAME}
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/../include
+            ${CMOCKA_INCLUDE_DIRS}
     )
     
     # Set test properties for better output

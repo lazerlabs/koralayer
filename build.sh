@@ -86,12 +86,9 @@ if [ ! -d ${BUILD_DIR} ]; then
     mkdir -p ${BUILD_DIR}
 fi
 
-# Change to build directory
-cd ${BUILD_DIR}
-
 # Configure with CMake
 echo -e "${GREEN}Configuring with CMake...${NC}"
-cmake ${CMAKE_OPTIONS} ..
+cmake -B ${BUILD_DIR} ${CMAKE_OPTIONS}
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}CMake configuration failed!${NC}"
@@ -100,7 +97,7 @@ fi
 
 # Build
 echo -e "${GREEN}Building...${NC}"
-cmake --build . -- ${MAKE_OPTIONS}
+cmake --build ${BUILD_DIR} -- ${MAKE_OPTIONS}
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Build failed!${NC}"
@@ -113,10 +110,11 @@ if [ "$RUN_TESTS" = true ]; then
     echo ""
     
     # Run tests with colored output
-    CMOCKA_MESSAGE_OUTPUT=stdout ctest -V
+    (cd ${BUILD_DIR} && CMOCKA_MESSAGE_OUTPUT=stdout ctest -V)
+    TEST_RESULT=$?
     
     # Check if tests passed
-    if [ $? -eq 0 ]; then
+    if [ $TEST_RESULT -eq 0 ]; then
         echo ""
         echo -e "${GREEN}All tests passed!${NC}"
     else
