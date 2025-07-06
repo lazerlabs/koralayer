@@ -21,6 +21,7 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_closedir`](#sys_closedir) | 13 | Close a directory |
 | [`sys_symlink`](#sys_symlink) | 14 | Create a symbolic link |
 | [`sys_readlink`](#sys_readlink) | 15 | Read the target of a symbolic link |
+| [`sys_rename`](#sys_rename) | 20 | Rename a file or directory |
 
 ## Common Constants
 
@@ -664,4 +665,41 @@ int main() {
 **Implementation Notes:**
 - Linux: Uses glibc `readlink()` function, ensures null-termination
 - macOS: Not yet implemented
-- Windows: Not yet implemented 
+- Windows: Not yet implemented
+
+### sys_rename
+
+**System Call Number:** 20
+
+**Prototype:**
+```c
+int sys_rename(const char *oldpath, const char *newpath);
+```
+
+**Description:**
+Renames a file or directory from `oldpath` to `newpath`.
+
+**Parameters:**
+- `oldpath`: Existing path of the file or directory
+- `newpath`: New desired path
+
+**Return Value:**
+- `0` on success
+- Negative error code on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    if (sys_rename("/tmp/oldname.txt", "/tmp/newname.txt") == 0) {
+        // rename successful
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `rename()` function
+- macOS: Not yet implemented
+- Windows: Not yet implemented

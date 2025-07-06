@@ -26,6 +26,7 @@ set(TEST_FILES
     test_io.c
     test_putc.c
     test_unlink.c
+    test_rename.c
 )
 
 # Platform specific test configurations

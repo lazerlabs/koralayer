@@ -454,5 +454,21 @@ int linux_sys_unlink(const char *path)
     }
     
     return 0;
-} 
+}
+
+/**
+ * Rename a file or directory
+ */
+int linux_sys_rename(const char *oldpath, const char *newpath)
+{
+    if (!oldpath || !newpath) {
+        return -EINVAL;
+    }
+
+    if (rename(oldpath, newpath) != 0) {
+        return -errno;
+    }
+
+    return 0;
+}
 

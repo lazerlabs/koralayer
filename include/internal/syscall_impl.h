@@ -43,6 +43,7 @@
     int linux_sys_symlink(const char *target, const char *linkpath);
     int linux_sys_readlink(const char *path, char *buf, size_t size);
     int linux_sys_unlink(const char *path);
+    int linux_sys_rename(const char *oldpath, const char *newpath);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
@@ -63,6 +64,7 @@
     int macos_sys_symlink(const char *target, const char *linkpath);
     int macos_sys_readlink(const char *path, char *buf, size_t size);
     int macos_sys_unlink(const char *path);
+    int macos_sys_rename(const char *oldpath, const char *newpath);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
@@ -83,6 +85,7 @@
     int windows_sys_symlink(const char *target, const char *linkpath);
     int windows_sys_readlink(const char *path, char *buf, size_t size);
     int windows_sys_unlink(const char *path);
+    int windows_sys_rename(const char *oldpath, const char *newpath);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);
