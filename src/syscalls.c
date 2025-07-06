@@ -195,3 +195,13 @@ int sys_unlink(const char *path) {
     return windows_sys_unlink(path);
 #endif
 }
+
+int sys_rename(const char *oldpath, const char *newpath) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_rename(oldpath, newpath);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_rename(oldpath, newpath);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_rename(oldpath, newpath);
+#endif
+}

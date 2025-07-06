@@ -35,6 +35,7 @@ extern "C" {
 #define SYS_GET_FILE_INFO 17 /* Get file information by path */
 #define SYS_GET_FD_INFO   18 /* Get file information by descriptor */
 #define SYS_EXISTS     19  /* Check if a path exists */
+#define SYS_RENAME     20  /* Rename a file or directory */
 
 /**
  * File open flags
@@ -283,6 +284,14 @@ int sys_exists(const char *path, uint8_t *type);
  * @return 0 on success, negative error code on failure
  */
 int sys_unlink(const char *path);
+
+/**
+ * Rename a file or directory
+ * @param oldpath Existing path
+ * @param newpath New path name
+ * @return 0 on success, negative error code on failure
+ */
+int sys_rename(const char *oldpath, const char *newpath);
 
 #ifdef __cplusplus
 }
