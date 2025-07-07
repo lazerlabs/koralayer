@@ -28,6 +28,7 @@ set(TEST_FILES
     test_unlink.c
     test_rename.c
     test_sbrk.c
+    test_mmap.c
 )
 
 # Platform specific test configurations

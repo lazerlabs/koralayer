@@ -38,6 +38,9 @@ extern "C" {
 #define SYS_RENAME     20  /* Rename a file or directory */
 #define SYS_BRK        21  /* Set program break */
 #define SYS_SBRK       22  /* Change program break by delta */
+#define SYS_MMAP       23  /* Map memory pages */
+#define SYS_MUNMAP     24  /* Unmap memory pages */
+#define SYS_MPROTECT   25  /* Change memory protection */
 
 /**
  * File open flags
@@ -308,6 +311,35 @@ void *sys_brk(void *new_end);
  * @return Previous program break on success, (void*)-1 on failure
  */
 void *sys_sbrk(ptrdiff_t delta);
+
+/**
+ * Map anonymous or file-backed memory into the process address space
+ * @param addr Desired address or NULL
+ * @param len Length of the mapping in bytes
+ * @param prot Protection flags (e.g., PROT_READ, PROT_WRITE)
+ * @param flags Mapping flags (e.g., MAP_PRIVATE, MAP_ANONYMOUS)
+ * @param fd File descriptor if mapping a file, or -1 for anonymous
+ * @param off Offset in the file
+ * @return Pointer to mapped region on success, (void*)-1 on failure
+ */
+void *sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+
+/**
+ * Unmap a previously mapped memory region
+ * @param addr Starting address of the mapping
+ * @param len Length of the mapping
+ * @return 0 on success, -1 on failure
+ */
+int sys_munmap(void *addr, size_t len);
+
+/**
+ * Change the protection of a memory region
+ * @param addr Start address
+ * @param len Length of region
+ * @param prot New protection flags
+ * @return 0 on success, -1 on failure
+ */
+int sys_mprotect(void *addr, size_t len, int prot);
 
 #ifdef __cplusplus
 }
