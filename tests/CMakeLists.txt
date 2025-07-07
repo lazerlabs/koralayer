@@ -27,6 +27,7 @@ set(TEST_FILES
     test_putc.c
     test_unlink.c
     test_rename.c
+    test_sbrk.c
 )
 
 # Platform specific test configurations

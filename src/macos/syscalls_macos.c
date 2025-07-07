@@ -463,4 +463,17 @@ int macos_sys_unlink(const char *path)
     return 0;
 }
 
+void *macos_sys_brk(void *new_end)
+{
+    if (brk(new_end) != 0) {
+        return (void *)-1;
+    }
+    return sbrk(0);
+}
+
+void *macos_sys_sbrk(ptrdiff_t delta)
+{
+    return sbrk(delta);
+}
+
 #endif // KORA_PLATFORM_MACOS 

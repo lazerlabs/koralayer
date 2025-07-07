@@ -36,6 +36,8 @@ extern "C" {
 #define SYS_GET_FD_INFO   18 /* Get file information by descriptor */
 #define SYS_EXISTS     19  /* Check if a path exists */
 #define SYS_RENAME     20  /* Rename a file or directory */
+#define SYS_BRK        21  /* Set program break */
+#define SYS_SBRK       22  /* Change program break by delta */
 
 /**
  * File open flags
@@ -292,6 +294,20 @@ int sys_unlink(const char *path);
  * @return 0 on success, negative error code on failure
  */
 int sys_rename(const char *oldpath, const char *newpath);
+
+/**
+ * Set the program break to a specific address
+ * @param new_end New end of the data segment
+ * @return New program break on success, (void*)-1 on failure
+ */
+void *sys_brk(void *new_end);
+
+/**
+ * Adjust the program break by a delta
+ * @param delta Number of bytes to add to the break (can be negative)
+ * @return Previous program break on success, (void*)-1 on failure
+ */
+void *sys_sbrk(ptrdiff_t delta);
 
 #ifdef __cplusplus
 }

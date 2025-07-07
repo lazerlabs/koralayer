@@ -205,3 +205,23 @@ int sys_rename(const char *oldpath, const char *newpath) {
     return windows_sys_rename(oldpath, newpath);
 #endif
 }
+
+void *sys_brk(void *new_end) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_brk(new_end);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_brk(new_end);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_brk(new_end);
+#endif
+}
+
+void *sys_sbrk(ptrdiff_t delta) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_sbrk(delta);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_sbrk(delta);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_sbrk(delta);
+#endif
+}
