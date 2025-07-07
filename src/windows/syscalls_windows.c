@@ -45,4 +45,16 @@ int windows_sys_ioctl(int fd, unsigned long request, void *arg) {
     /* TODO: Implement Windows version */
     return KORA_ERROR;
 }
+
+void *windows_sys_brk(void *new_end) {
+    (void)new_end;
+    /* TODO: Implement Windows version */
+    return (void *)-1;
+}
+
+void *windows_sys_sbrk(ptrdiff_t delta) {
+    (void)delta;
+    /* TODO: Implement Windows version */
+    return (void *)-1;
+}
 #endif 

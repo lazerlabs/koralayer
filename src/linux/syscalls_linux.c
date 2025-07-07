@@ -472,3 +472,16 @@ int linux_sys_rename(const char *oldpath, const char *newpath)
     return 0;
 }
 
+void *linux_sys_brk(void *new_end)
+{
+    if (brk(new_end) != 0) {
+        return (void *)-1;
+    }
+    return sbrk(0);
+}
+
+void *linux_sys_sbrk(ptrdiff_t delta)
+{
+    return sbrk(delta);
+}
+

@@ -22,6 +22,8 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_symlink`](#sys_symlink) | 14 | Create a symbolic link |
 | [`sys_readlink`](#sys_readlink) | 15 | Read the target of a symbolic link |
 | [`sys_rename`](#sys_rename) | 20 | Rename a file or directory |
+| [`sys_brk`](#sys_brk) | 21 | Set program break |
+| [`sys_sbrk`](#sys_sbrk) | 22 | Adjust program break |
 
 ## Common Constants
 
@@ -702,4 +704,68 @@ int main() {
 **Implementation Notes:**
 - Linux: Uses glibc `rename()` function
 - macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_brk
+
+**System Call Number:** 21
+
+**Prototype:**
+```c
+void *sys_brk(void *new_end);
+```
+
+**Description:**
+Moves the program break to `new_end`.
+
+**Parameters:**
+- `new_end`: New end address for the data segment
+
+**Return Value:**
+- New program break address on success
+- `(void*)-1` on failure
+
+**Example:**
+```c
+void *cur = sys_brk(some_addr);
+if (cur == (void*)-1) {
+    // error
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `brk()` and `sbrk(0)`
+- macOS: Same as Linux
+- Windows: Not yet implemented
+
+### sys_sbrk
+
+**System Call Number:** 22
+
+**Prototype:**
+```c
+void *sys_sbrk(ptrdiff_t delta);
+```
+
+**Description:**
+Adjusts the program break by `delta` bytes.
+
+**Parameters:**
+- `delta`: Number of bytes to add to the break (can be negative)
+
+**Return Value:**
+- Previous program break address on success
+- `(void*)-1` on failure
+
+**Example:**
+```c
+void *old = sys_sbrk(4096);
+if (old != (void*)-1) {
+    // use memory starting at old
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses glibc `sbrk()`
+- macOS: Same as Linux
 - Windows: Not yet implemented
