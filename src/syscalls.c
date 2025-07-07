@@ -205,3 +205,33 @@ int sys_rename(const char *oldpath, const char *newpath) {
     return windows_sys_rename(oldpath, newpath);
 #endif
 }
+
+void *sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_mmap(addr, len, prot, flags, fd, off);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_mmap(addr, len, prot, flags, fd, off);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_mmap(addr, len, prot, flags, fd, off);
+#endif
+}
+
+int sys_munmap(void *addr, size_t len) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_munmap(addr, len);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_munmap(addr, len);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_munmap(addr, len);
+#endif
+}
+
+int sys_mprotect(void *addr, size_t len, int prot) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_mprotect(addr, len, prot);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_mprotect(addr, len, prot);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_mprotect(addr, len, prot);
+#endif
+}

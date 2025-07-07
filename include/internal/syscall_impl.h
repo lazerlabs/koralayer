@@ -47,6 +47,9 @@
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
+    void *linux_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+    int linux_sys_munmap(void *addr, size_t len);
+    int linux_sys_mprotect(void *addr, size_t len, int prot);
 #elif defined(KORA_PLATFORM_MACOS)
     int macos_sys_putc(char c);
     int macos_sys_getc(void);
@@ -68,6 +71,9 @@
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
+    void *macos_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+    int macos_sys_munmap(void *addr, size_t len);
+    int macos_sys_mprotect(void *addr, size_t len, int prot);
 #elif defined(KORA_PLATFORM_WINDOWS)
     int windows_sys_putc(char c);
     int windows_sys_getc(void);
@@ -89,4 +95,7 @@
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);
-#endif 
+    void *windows_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+    int windows_sys_munmap(void *addr, size_t len);
+    int windows_sys_mprotect(void *addr, size_t len, int prot);
+#endif

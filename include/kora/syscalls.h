@@ -36,6 +36,9 @@ extern "C" {
 #define SYS_GET_FD_INFO   18 /* Get file information by descriptor */
 #define SYS_EXISTS     19  /* Check if a path exists */
 #define SYS_RENAME     20  /* Rename a file or directory */
+#define SYS_MMAP       23  /* Map memory region */
+#define SYS_MUNMAP     24  /* Unmap memory region */
+#define SYS_MPROTECT   25  /* Change memory protection */
 
 /**
  * File open flags
@@ -292,6 +295,21 @@ int sys_unlink(const char *path);
  * @return 0 on success, negative error code on failure
  */
 int sys_rename(const char *oldpath, const char *newpath);
+
+/**
+ * Map anonymous or file-backed memory
+ */
+void *sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+
+/**
+ * Unmap a region of memory previously mapped with sys_mmap
+ */
+int sys_munmap(void *addr, size_t len);
+
+/**
+ * Change protection on a region of memory
+ */
+int sys_mprotect(void *addr, size_t len, int prot);
 
 #ifdef __cplusplus
 }

@@ -45,4 +45,23 @@ int windows_sys_ioctl(int fd, unsigned long request, void *arg) {
     /* TODO: Implement Windows version */
     return KORA_ERROR;
 }
-#endif 
+
+void *windows_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off) {
+    /* TODO: Implement Windows version */
+    (void)addr; (void)len; (void)prot; (void)flags; (void)fd; (void)off;
+    return (void *)-1;
+}
+
+int windows_sys_munmap(void *addr, size_t len) {
+    /* TODO: Implement Windows version */
+    (void)addr; (void)len;
+    return -1;
+}
+
+int windows_sys_mprotect(void *addr, size_t len, int prot) {
+    /* TODO: Implement Windows version */
+    (void)addr; (void)len; (void)prot;
+    return -1;
+}
+
+#endif // KORA_PLATFORM_WINDOWS

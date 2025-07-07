@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/mman.h>
 
 /**
  * macOS implementation of KoraOS system calls
@@ -463,4 +464,29 @@ int macos_sys_unlink(const char *path)
     return 0;
 }
 
-#endif // KORA_PLATFORM_MACOS 
+void *macos_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+{
+    void *result = mmap(addr, len, prot, flags, fd, off);
+    if (result == MAP_FAILED) {
+        return MAP_FAILED;
+    }
+    return result;
+}
+
+int macos_sys_munmap(void *addr, size_t len)
+{
+    if (munmap(addr, len) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+int macos_sys_mprotect(void *addr, size_t len, int prot)
+{
+    if (mprotect(addr, len, prot) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+#endif // KORA_PLATFORM_MACOS

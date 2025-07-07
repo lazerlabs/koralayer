@@ -22,6 +22,9 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_symlink`](#sys_symlink) | 14 | Create a symbolic link |
 | [`sys_readlink`](#sys_readlink) | 15 | Read the target of a symbolic link |
 | [`sys_rename`](#sys_rename) | 20 | Rename a file or directory |
+| [`sys_mmap`](#sys_mmap) | 23 | Map anonymous or file-backed memory |
+| [`sys_munmap`](#sys_munmap) | 24 | Unmap a memory region |
+| [`sys_mprotect`](#sys_mprotect) | 25 | Change memory protection |
 
 ## Common Constants
 
@@ -702,4 +705,99 @@ int main() {
 **Implementation Notes:**
 - Linux: Uses glibc `rename()` function
 - macOS: Not yet implemented
+- Windows: Not yet implemented
+
+### sys_mmap
+
+**System Call Number:** 23
+
+**Prototype:**
+```c
+void *sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+```
+
+**Description:**
+Maps anonymous or file-backed memory into the process address space.
+
+**Parameters:**
+- `addr`: Desired address or `NULL` for automatic placement
+- `len`: Length of the mapping in bytes
+- `prot`: Protection flags (e.g. `PROT_READ`, `PROT_WRITE`)
+- `flags`: Mapping flags (e.g. `MAP_PRIVATE`, `MAP_ANONYMOUS`)
+- `fd`: File descriptor if mapping a file, otherwise `-1`
+- `off`: Offset within the file for the mapping
+
+**Return Value:**
+- Pointer to the mapped region on success
+- `(void *)-1` on failure
+
+**Example:**
+```c
+#include <kora/syscalls.h>
+
+int main() {
+    void *mem = sys_mmap(NULL, 4096, PROT_READ | PROT_WRITE,
+                         MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (mem != (void *)-1) {
+        // Use memory
+        sys_munmap(mem, 4096);
+    }
+    return 0;
+}
+```
+
+**Implementation Notes:**
+- Linux: Uses POSIX `mmap()`
+- macOS: Uses POSIX `mmap()`
+- Windows: Not yet implemented
+
+### sys_munmap
+
+**System Call Number:** 24
+
+**Prototype:**
+```c
+int sys_munmap(void *addr, size_t len);
+```
+
+**Description:**
+Unmaps a region of memory previously mapped with `sys_mmap`.
+
+**Parameters:**
+- `addr`: Address of the mapping
+- `len`: Length of the mapping
+
+**Return Value:**
+- `0` on success
+- `-1` on failure
+
+**Implementation Notes:**
+- Linux: Uses POSIX `munmap()`
+- macOS: Uses POSIX `munmap()`
+- Windows: Not yet implemented
+
+### sys_mprotect
+
+**System Call Number:** 25
+
+**Prototype:**
+```c
+int sys_mprotect(void *addr, size_t len, int prot);
+```
+
+**Description:**
+Changes the memory protection of an existing mapping.
+
+**Parameters:**
+- `addr`: Address of the mapping
+- `len`: Length of the mapping
+- `prot`: New protection flags
+
+**Return Value:**
+- `0` on success
+- `-1` on failure
+
+**Implementation Notes:**
+- Linux: Uses POSIX `mprotect()`
+- macOS: Uses POSIX `mprotect()`
 - Windows: Not yet implemented
