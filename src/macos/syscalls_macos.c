@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/mman.h>
 
 /**
  * macOS implementation of KoraOS system calls
@@ -474,6 +475,25 @@ void *macos_sys_brk(void *new_end)
 void *macos_sys_sbrk(ptrdiff_t delta)
 {
     return sbrk(delta);
+}
+
+void *macos_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+{
+    void *res = mmap(addr, len, prot, flags, fd, off);
+    if (res == MAP_FAILED) {
+        return (void *)-1;
+    }
+    return res;
+}
+
+int macos_sys_munmap(void *addr, size_t len)
+{
+    return munmap(addr, len);
+}
+
+int macos_sys_mprotect(void *addr, size_t len, int prot)
+{
+    return mprotect(addr, len, prot);
 }
 
 #endif // KORA_PLATFORM_MACOS 

@@ -24,6 +24,9 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_rename`](#sys_rename) | 20 | Rename a file or directory |
 | [`sys_brk`](#sys_brk) | 21 | Set program break |
 | [`sys_sbrk`](#sys_sbrk) | 22 | Adjust program break |
+| [`sys_mmap`](#sys_mmap) | 23 | Map memory pages |
+| [`sys_munmap`](#sys_munmap) | 24 | Unmap memory pages |
+| [`sys_mprotect`](#sys_mprotect) | 25 | Change memory protection |
 
 ## Common Constants
 
@@ -768,4 +771,84 @@ if (old != (void*)-1) {
 **Implementation Notes:**
 - Linux: Uses glibc `sbrk()`
 - macOS: Same as Linux
+- Windows: Not yet implemented
+
+### sys_mmap
+
+**System Call Number:** 23
+
+**Prototype:**
+```c
+void *sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+```
+
+**Description:**
+Maps anonymous or file-backed memory into the process address space.
+
+**Parameters:**
+- `addr`: Desired mapping address or `NULL` for automatic placement
+- `len`: Length of the mapping in bytes
+- `prot`: Protection flags (`PROT_READ`, `PROT_WRITE`, etc.)
+- `flags`: Mapping flags (`MAP_PRIVATE`, `MAP_ANONYMOUS`, etc.)
+- `fd`: File descriptor when mapping a file, or `-1` for anonymous mappings
+- `off`: Offset within the file
+
+**Return Value:**
+- Pointer to the mapped region on success
+- `(void*)-1` on failure
+
+**Implementation Notes:**
+- Linux: Thin wrapper around `mmap()`
+- macOS: Thin wrapper around `mmap()`
+- Windows: Not yet implemented
+
+### sys_munmap
+
+**System Call Number:** 24
+
+**Prototype:**
+```c
+int sys_munmap(void *addr, size_t len);
+```
+
+**Description:**
+Unmaps a previously mapped memory region.
+
+**Parameters:**
+- `addr`: Start address of the mapping
+- `len`: Length of the mapping
+
+**Return Value:**
+- `0` on success
+- `-1` on failure
+
+**Implementation Notes:**
+- Linux: Thin wrapper around `munmap()`
+- macOS: Thin wrapper around `munmap()`
+- Windows: Not yet implemented
+
+### sys_mprotect
+
+**System Call Number:** 25
+
+**Prototype:**
+```c
+int sys_mprotect(void *addr, size_t len, int prot);
+```
+
+**Description:**
+Changes the protection flags of pages in an existing mapping.
+
+**Parameters:**
+- `addr`: Start address
+- `len`: Length of region
+- `prot`: New protection flags
+
+**Return Value:**
+- `0` on success
+- `-1` on failure
+
+**Implementation Notes:**
+- Linux: Wraps `mprotect()`
+- macOS: Wraps `mprotect()`
 - Windows: Not yet implemented

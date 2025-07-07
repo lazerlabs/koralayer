@@ -57,4 +57,22 @@ void *windows_sys_sbrk(ptrdiff_t delta) {
     /* TODO: Implement Windows version */
     return (void *)-1;
 }
-#endif 
+
+void *windows_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off) {
+    (void)addr; (void)len; (void)prot; (void)flags; (void)fd; (void)off;
+    /* TODO: Implement Windows version */
+    return (void *)-1;
+}
+
+int windows_sys_munmap(void *addr, size_t len) {
+    (void)addr; (void)len;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_mprotect(void *addr, size_t len, int prot) {
+    (void)addr; (void)len; (void)prot;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+#endif

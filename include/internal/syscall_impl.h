@@ -46,6 +46,9 @@
     int linux_sys_rename(const char *oldpath, const char *newpath);
     void *linux_sys_brk(void *new_end);
     void *linux_sys_sbrk(ptrdiff_t delta);
+    void *linux_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+    int linux_sys_munmap(void *addr, size_t len);
+    int linux_sys_mprotect(void *addr, size_t len, int prot);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
@@ -69,6 +72,9 @@
     int macos_sys_rename(const char *oldpath, const char *newpath);
     void *macos_sys_brk(void *new_end);
     void *macos_sys_sbrk(ptrdiff_t delta);
+    void *macos_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+    int macos_sys_munmap(void *addr, size_t len);
+    int macos_sys_mprotect(void *addr, size_t len, int prot);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
@@ -92,6 +98,9 @@
     int windows_sys_rename(const char *oldpath, const char *newpath);
     void *windows_sys_brk(void *new_end);
     void *windows_sys_sbrk(ptrdiff_t delta);
+    void *windows_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
+    int windows_sys_munmap(void *addr, size_t len);
+    int windows_sys_mprotect(void *addr, size_t len, int prot);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);
