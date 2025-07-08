@@ -255,3 +255,34 @@ int sys_mprotect(void *addr, size_t len, int prot) {
     return windows_sys_mprotect(addr, len, prot);
 #endif
 }
+
+pid_t sys_spawn(const char *path, char *const argv[], char *const envp[]) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_spawn(path, argv, envp);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_spawn(path, argv, envp);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_spawn(path, argv, envp);
+#endif
+}
+
+void sys_exit(int status) {
+#if defined(KORA_PLATFORM_LINUX)
+    linux_sys_exit(status);
+#elif defined(KORA_PLATFORM_MACOS)
+    macos_sys_exit(status);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    windows_sys_exit(status);
+#endif
+    while (1) { } /* Should not return */
+}
+
+pid_t sys_wait(pid_t pid, int *status, int options) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_wait(pid, status, options);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_wait(pid, status, options);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_wait(pid, status, options);
+#endif
+}

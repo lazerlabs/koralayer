@@ -1,4 +1,5 @@
 #include <internal/syscall_impl.h>
+#include <sys/types.h>
 
 /**
  * Windows implementation of KoraOS system calls
@@ -72,6 +73,23 @@ int windows_sys_munmap(void *addr, size_t len) {
 
 int windows_sys_mprotect(void *addr, size_t len, int prot) {
     (void)addr; (void)len; (void)prot;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+pid_t windows_sys_spawn(const char *path, char *const argv[], char *const envp[]) {
+    (void)path; (void)argv; (void)envp;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+void windows_sys_exit(int status) {
+    (void)status;
+    /* TODO: Implement Windows version */
+}
+
+pid_t windows_sys_wait(pid_t pid, int *status, int options) {
+    (void)pid; (void)status; (void)options;
     /* TODO: Implement Windows version */
     return -1;
 }

@@ -27,6 +27,9 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_mmap`](#sys_mmap) | 23 | Map memory pages |
 | [`sys_munmap`](#sys_munmap) | 24 | Unmap memory pages |
 | [`sys_mprotect`](#sys_mprotect) | 25 | Change memory protection |
+| [`sys_spawn`](#sys_spawn) | 26 | Spawn a new process |
+| [`sys_exit`](#sys_exit) | 27 | Terminate the calling task |
+| [`sys_wait`](#sys_wait) | 28 | Wait for a child process |
 
 ## Common Constants
 
@@ -851,4 +854,71 @@ Changes the protection flags of pages in an existing mapping.
 **Implementation Notes:**
 - Linux: Wraps `mprotect()`
 - macOS: Wraps `mprotect()`
+- Windows: Not yet implemented
+
+### sys_spawn
+
+**System Call Number:** 26
+
+**Prototype:**
+```c
+pid_t sys_spawn(const char *path, char *const argv[], char *const envp[]);
+```
+
+**Description:**
+Launches a new process executing the ELF binary at `path`. File descriptors are
+inherited from the calling task.
+
+**Parameters:**
+- `path`: Path to the executable
+- `argv`: Argument vector (NULL terminated)
+- `envp`: Environment vector (NULL terminated) or `NULL` to inherit
+
+**Return Value:**
+- Child PID on success
+- `-1` on failure
+
+**Implementation Notes:**
+- Linux/macOS: Thin wrapper around `posix_spawn()`
+- Windows: Not yet implemented
+
+### sys_exit
+
+**System Call Number:** 27
+
+**Prototype:**
+```c
+void sys_exit(int status);
+```
+
+**Description:**
+Terminates the calling task with the provided exit status.
+
+**Implementation Notes:**
+- Linux/macOS: Wraps `_exit()`
+- Windows: Not yet implemented
+
+### sys_wait
+
+**System Call Number:** 28
+
+**Prototype:**
+```c
+pid_t sys_wait(pid_t pid, int *status, int options);
+```
+
+**Description:**
+Blocks until the specified child process exits (or any child if `pid` is -1).
+
+**Parameters:**
+- `pid`: PID to wait for or -1
+- `status`: Pointer to store exit status
+- `options`: Options passed directly to `waitpid`
+
+**Return Value:**
+- PID of the exited child on success
+- `-1` on failure
+
+**Implementation Notes:**
+- Linux/macOS: Wrap `waitpid()`
 - Windows: Not yet implemented

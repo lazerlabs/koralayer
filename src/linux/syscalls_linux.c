@@ -10,6 +10,9 @@
 #include <string.h>
 #include <stdint.h>
 #include <sys/mman.h>
+#include <spawn.h>
+#include <sys/wait.h>
+extern char **environ;
 
 /**
  * Linux implementation of KoraOS system calls
@@ -503,5 +506,31 @@ int linux_sys_munmap(void *addr, size_t len)
 int linux_sys_mprotect(void *addr, size_t len, int prot)
 {
     return mprotect(addr, len, prot);
+}
+
+pid_t linux_sys_spawn(const char *path, char *const argv[], char *const envp[])
+{
+    pid_t pid;
+    int ret = posix_spawn(&pid, path, NULL, NULL, argv,
+                          envp ? envp : environ);
+    if (ret != 0) {
+        errno = ret;
+        return -1;
+    }
+    return pid;
+}
+
+void linux_sys_exit(int status)
+{
+    _exit(status);
+}
+
+pid_t linux_sys_wait(pid_t pid, int *status, int options)
+{
+    pid_t res = waitpid(pid, status, options);
+    if (res < 0) {
+        return -1;
+    }
+    return res;
 }
 
