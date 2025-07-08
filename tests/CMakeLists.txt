@@ -29,6 +29,7 @@ set(TEST_FILES
     test_rename.c
     test_sbrk.c
     test_mmap.c
+    test_spawn.c
 )
 
 # Platform specific test configurations

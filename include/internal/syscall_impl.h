@@ -52,6 +52,9 @@
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
+    pid_t linux_sys_spawn(const char *path, char *const argv[], char *const envp[]);
+    void linux_sys_exit(int status) __attribute__((noreturn));
+    pid_t linux_sys_wait(pid_t pid, int *status, int options);
 #elif defined(KORA_PLATFORM_MACOS)
     int macos_sys_putc(char c);
     int macos_sys_getc(void);
@@ -78,6 +81,9 @@
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
+    pid_t macos_sys_spawn(const char *path, char *const argv[], char *const envp[]);
+    void macos_sys_exit(int status) __attribute__((noreturn));
+    pid_t macos_sys_wait(pid_t pid, int *status, int options);
 #elif defined(KORA_PLATFORM_WINDOWS)
     int windows_sys_putc(char c);
     int windows_sys_getc(void);
@@ -104,4 +110,7 @@
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);
-#endif 
+    pid_t windows_sys_spawn(const char *path, char *const argv[], char *const envp[]);
+    void windows_sys_exit(int status);
+    pid_t windows_sys_wait(pid_t pid, int *status, int options);
+#endif

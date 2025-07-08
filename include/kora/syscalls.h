@@ -12,6 +12,7 @@ extern "C" {
 
 #include <stddef.h>  /* For size_t */
 #include <stdint.h>  /* For uint32_t, uint64_t */
+#include <sys/types.h> /* For pid_t */
 
 /**
  * System call numbers
@@ -41,6 +42,9 @@ extern "C" {
 #define SYS_MMAP       23  /* Map memory pages */
 #define SYS_MUNMAP     24  /* Unmap memory pages */
 #define SYS_MPROTECT   25  /* Change memory protection */
+#define SYS_SPAWN      26  /* Spawn a new process */
+#define SYS_EXIT       27  /* Terminate the calling task */
+#define SYS_WAIT       28  /* Wait for a child process */
 
 /**
  * File open flags
@@ -340,6 +344,33 @@ int sys_munmap(void *addr, size_t len);
  * @return 0 on success, -1 on failure
  */
 int sys_mprotect(void *addr, size_t len, int prot);
+
+/**
+ * Spawn a new process executing the program at `path`.
+ * The child inherits file descriptors and environment.
+ *
+ * @param path Path to executable
+ * @param argv NULL-terminated argument vector
+ * @param envp NULL-terminated environment vector, or NULL to inherit
+ * @return Child PID on success, -1 on failure
+ */
+pid_t sys_spawn(const char *path, char *const argv[], char *const envp[]);
+
+/**
+ * Terminate the calling task with the given status.
+ * This function does not return.
+ */
+void sys_exit(int status) __attribute__((noreturn));
+
+/**
+ * Wait for a child process to exit.
+ *
+ * @param pid PID to wait for or -1 for any child
+ * @param status Pointer to store exit status
+ * @param options Options passed to waitpid
+ * @return PID of the exited child or -1 on error
+ */
+pid_t sys_wait(pid_t pid, int *status, int options);
 
 #ifdef __cplusplus
 }
