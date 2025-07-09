@@ -45,6 +45,10 @@ extern "C" {
 #define SYS_SPAWN      26  /* Spawn a new process */
 #define SYS_EXIT       27  /* Terminate the calling task */
 #define SYS_WAIT       28  /* Wait for a child process */
+#define SYS_YIELD      29  /* Yield the processor */
+#define SYS_GETPID     30  /* Get current process ID */
+#define SYS_GETPPID    31  /* Get parent process ID */
+#define SYS_SETPRIORITY 32 /* Set process scheduling priority */
 
 /**
  * File open flags
@@ -371,6 +375,22 @@ void sys_exit(int status) __attribute__((noreturn));
  * @return PID of the exited child or -1 on error
  */
 pid_t sys_wait(pid_t pid, int *status, int options);
+
+/**
+ * Yield the processor to another runnable task.
+ *
+ * @return 0 on success, -1 on failure
+ */
+int sys_yield(void);
+
+/** Get the current process ID */
+pid_t sys_getpid(void);
+
+/** Get the parent process ID */
+pid_t sys_getppid(void);
+
+/** Set scheduling priority for a process */
+int sys_setpriority(pid_t pid, int prio);
 
 #ifdef __cplusplus
 }

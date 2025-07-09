@@ -12,6 +12,8 @@
 #include <sys/mman.h>
 #include <spawn.h>
 #include <sys/wait.h>
+#include <sched.h>
+#include <sys/resource.h>
 extern char **environ;
 
 /**
@@ -532,5 +534,25 @@ pid_t linux_sys_wait(pid_t pid, int *status, int options)
         return -1;
     }
     return res;
+}
+
+int linux_sys_yield(void)
+{
+    return sched_yield();
+}
+
+pid_t linux_sys_getpid(void)
+{
+    return getpid();
+}
+
+pid_t linux_sys_getppid(void)
+{
+    return getppid();
+}
+
+int linux_sys_setpriority(pid_t pid, int prio)
+{
+    return setpriority(PRIO_PROCESS, pid, prio);
 }
 

@@ -49,6 +49,10 @@
     void *linux_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
     int linux_sys_munmap(void *addr, size_t len);
     int linux_sys_mprotect(void *addr, size_t len, int prot);
+    int linux_sys_yield(void);
+    pid_t linux_sys_getpid(void);
+    pid_t linux_sys_getppid(void);
+    int linux_sys_setpriority(pid_t pid, int prio);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
@@ -78,6 +82,10 @@
     void *macos_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
     int macos_sys_munmap(void *addr, size_t len);
     int macos_sys_mprotect(void *addr, size_t len, int prot);
+    int macos_sys_yield(void);
+    pid_t macos_sys_getpid(void);
+    pid_t macos_sys_getppid(void);
+    int macos_sys_setpriority(pid_t pid, int prio);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
@@ -107,6 +115,10 @@
     void *windows_sys_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off);
     int windows_sys_munmap(void *addr, size_t len);
     int windows_sys_mprotect(void *addr, size_t len, int prot);
+    int windows_sys_yield(void);
+    pid_t windows_sys_getpid(void);
+    pid_t windows_sys_getppid(void);
+    int windows_sys_setpriority(pid_t pid, int prio);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);

@@ -286,3 +286,43 @@ pid_t sys_wait(pid_t pid, int *status, int options) {
     return windows_sys_wait(pid, status, options);
 #endif
 }
+
+int sys_yield(void) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_yield();
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_yield();
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_yield();
+#endif
+}
+
+pid_t sys_getpid(void) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_getpid();
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_getpid();
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_getpid();
+#endif
+}
+
+pid_t sys_getppid(void) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_getppid();
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_getppid();
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_getppid();
+#endif
+}
+
+int sys_setpriority(pid_t pid, int prio) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_setpriority(pid, prio);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_setpriority(pid, prio);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_setpriority(pid, prio);
+#endif
+}

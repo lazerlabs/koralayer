@@ -30,6 +30,7 @@ set(TEST_FILES
     test_sbrk.c
     test_mmap.c
     test_spawn.c
+    test_sched.c
 )
 
 # Platform specific test configurations
