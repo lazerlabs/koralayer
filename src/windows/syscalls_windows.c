@@ -93,4 +93,25 @@ pid_t windows_sys_wait(pid_t pid, int *status, int options) {
     /* TODO: Implement Windows version */
     return -1;
 }
+
+int windows_sys_yield(void) {
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+pid_t windows_sys_getpid(void) {
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+pid_t windows_sys_getppid(void) {
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_setpriority(pid_t pid, int prio) {
+    (void)pid; (void)prio;
+    /* TODO: Implement Windows version */
+    return -1;
+}
 #endif
