@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <semaphore.h>
 #include <sys/select.h>
+#include <time.h>
+#include <sys/time.h>
 
 /**
  * Windows implementation of KoraOS system calls
@@ -150,6 +152,31 @@ int windows_sys_sem_wait(sem_t *sem) {
 int windows_sys_sem_post(sem_t *sem) {
     (void)sem;
     /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_clock_gettime(clockid_t id, struct timespec *tp) {
+    (void)id; (void)tp;
+    return -1;
+}
+
+int windows_sys_gettimeofday(struct timeval *tv, void *tz) {
+    (void)tv; (void)tz;
+    return -1;
+}
+
+int windows_sys_nanosleep(const struct timespec *req, struct timespec *rem) {
+    (void)req; (void)rem;
+    return -1;
+}
+
+unsigned windows_sys_sleep(unsigned seconds) {
+    (void)seconds;
+    return seconds;
+}
+
+int windows_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old) {
+    (void)which; (void)new; (void)old;
     return -1;
 }
 #endif

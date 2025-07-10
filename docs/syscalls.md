@@ -42,5 +42,10 @@ The table below lists all system calls currently exposed by `kora/syscalls.h`. T
 | 36 | `sys_select` | Wait for descriptor readiness |
 | 37 | `sys_sem_wait` | Wait on a semaphore |
 | 38 | `sys_sem_post` | Post to a semaphore |
+| 39 | `sys_clock_gettime` | Get time from a clock |
+| 40 | `sys_gettimeofday` | Legacy time retrieval |
+| 41 | `sys_nanosleep` | Sleep for nanoseconds |
+| 42 | `sys_sleep` | Sleep for seconds |
+| 43 | `sys_setitimer` | Set an interval timer |
 
 `kora/syscalls.h` also defines constants for open flags, seek modes, status codes and directory entry types.  Those are mirrored in the header and should be used when porting applications.

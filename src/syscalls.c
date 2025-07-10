@@ -386,3 +386,53 @@ int sys_sem_post(sem_t *sem) {
     return windows_sys_sem_post(sem);
 #endif
 }
+
+int sys_clock_gettime(clockid_t id, struct timespec *tp) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_clock_gettime(id, tp);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_clock_gettime(id, tp);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_clock_gettime(id, tp);
+#endif
+}
+
+int sys_gettimeofday(struct timeval *tv, void *tz) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_gettimeofday(tv, tz);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_gettimeofday(tv, tz);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_gettimeofday(tv, tz);
+#endif
+}
+
+int sys_nanosleep(const struct timespec *req, struct timespec *rem) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_nanosleep(req, rem);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_nanosleep(req, rem);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_nanosleep(req, rem);
+#endif
+}
+
+unsigned sys_sleep(unsigned seconds) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_sleep(seconds);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_sleep(seconds);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_sleep(seconds);
+#endif
+}
+
+int sys_setitimer(int which, const struct itimerval *new, struct itimerval *old) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_setitimer(which, new, old);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_setitimer(which, new, old);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_setitimer(which, new, old);
+#endif
+}

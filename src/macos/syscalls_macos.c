@@ -17,6 +17,8 @@
 #include <semaphore.h>
 #include <sched.h>
 #include <sys/resource.h>
+#include <time.h>
+#include <sys/time.h>
 extern char **environ;
 
 /**
@@ -582,6 +584,33 @@ int macos_sys_sem_wait(sem_t *sem)
 int macos_sys_sem_post(sem_t *sem)
 {
     return sem_post(sem);
+}
+
+int macos_sys_clock_gettime(clockid_t id, struct timespec *tp)
+{
+    return clock_gettime(id, tp);
+}
+
+int macos_sys_gettimeofday(struct timeval *tv, void *tz)
+{
+    (void)tz;
+    return gettimeofday(tv, NULL);
+}
+
+int macos_sys_nanosleep(const struct timespec *req, struct timespec *rem)
+{
+    return nanosleep(req, rem);
+}
+
+unsigned macos_sys_sleep(unsigned seconds)
+{
+    struct timespec req = { (time_t)seconds, 0 };
+    return nanosleep(&req, NULL);
+}
+
+int macos_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old)
+{
+    return setitimer(which, new, old);
 }
 
 #endif // KORA_PLATFORM_MACOS

@@ -14,6 +14,8 @@ extern "C" {
 #include <stdint.h>  /* For uint32_t, uint64_t */
 #include <sys/types.h> /* For pid_t */
 #include <semaphore.h> /* For sem_t */
+#include <time.h>      /* For timespec */
+#include <sys/time.h>  /* For timeval */
 
 /**
  * System call numbers
@@ -56,6 +58,11 @@ extern "C" {
 #define SYS_SELECT     36  /* Wait for descriptor readiness */
 #define SYS_SEM_WAIT   37  /* Wait on a semaphore */
 #define SYS_SEM_POST   38  /* Post to a semaphore */
+#define SYS_CLOCK_GETTIME 39 /* Get time from a clock */
+#define SYS_GETTIMEOFDAY 40 /* Legacy time retrieval */
+#define SYS_NANOSLEEP  41  /* Sleep for nanoseconds */
+#define SYS_SLEEP      42  /* Sleep for seconds */
+#define SYS_SETITIMER  43  /* Set interval timer */
 
 /**
  * File open flags
@@ -416,6 +423,21 @@ int sys_sem_wait(sem_t *sem);
 
 /** Post to a semaphore */
 int sys_sem_post(sem_t *sem);
+
+/** Get time from a specific clock */
+int sys_clock_gettime(clockid_t id, struct timespec *tp);
+
+/** Get the current time of day */
+int sys_gettimeofday(struct timeval *tv, void *tz);
+
+/** Sleep for a number of nanoseconds */
+int sys_nanosleep(const struct timespec *req, struct timespec *rem);
+
+/** Sleep for a whole number of seconds */
+unsigned sys_sleep(unsigned seconds);
+
+/** Set an interval timer */
+int sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
 
 #ifdef __cplusplus
 }

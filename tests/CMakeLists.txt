@@ -35,6 +35,7 @@ set(TEST_FILES
     test_dup.c
     test_select.c
     test_sem.c
+    test_time.c
 )
 
 # Platform specific test configurations
