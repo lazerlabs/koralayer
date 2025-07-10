@@ -30,6 +30,12 @@ This document describes all system calls implemented in the KoraLayer compatibil
 | [`sys_spawn`](#sys_spawn) | 26 | Spawn a new process |
 | [`sys_exit`](#sys_exit) | 27 | Terminate the calling task |
 | [`sys_wait`](#sys_wait) | 28 | Wait for a child process |
+| [`sys_pipe`](#sys_pipe) | 33 | Create an anonymous pipe |
+| [`sys_dup`](#sys_dup) | 34 | Duplicate a file descriptor |
+| [`sys_dup2`](#sys_dup2) | 35 | Duplicate to a specific descriptor |
+| [`sys_select`](#sys_select) | 36 | Wait for descriptor readiness |
+| [`sys_sem_wait`](#sys_sem_wait) | 37 | Wait on a semaphore |
+| [`sys_sem_post`](#sys_sem_post) | 38 | Post to a semaphore |
 
 ## Common Constants
 
@@ -106,6 +112,8 @@ int main() {
 - Linux: Uses glibc `putchar()` function
 - macOS: Not yet implemented
 - Windows: Not yet implemented
+
+
 
 ### sys_getc
 
@@ -922,3 +930,63 @@ Blocks until the specified child process exits (or any child if `pid` is -1).
 **Implementation Notes:**
 - Linux/macOS: Wrap `waitpid()`
 - Windows: Not yet implemented
+
+### sys_pipe
+
+**System Call Number:** 33
+
+**Prototype:**
+```c
+int sys_pipe(int fds[2]);
+```
+Creates a non-blocking read/write file descriptor pair.
+
+### sys_dup
+
+**System Call Number:** 34
+
+**Prototype:**
+```c
+int sys_dup(int oldfd);
+```
+Duplicate an existing descriptor.
+
+### sys_dup2
+
+**System Call Number:** 35
+
+**Prototype:**
+```c
+int sys_dup2(int oldfd, int newfd);
+```
+Duplicate to a specified descriptor, replacing it if needed.
+
+### sys_select
+
+**System Call Number:** 36
+
+**Prototype:**
+```c
+int sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
+```
+Wait for descriptor readiness.
+
+### sys_sem_wait
+
+**System Call Number:** 37
+
+**Prototype:**
+```c
+int sys_sem_wait(sem_t *sem);
+```
+Wait on a semaphore.
+
+### sys_sem_post
+
+**System Call Number:** 38
+
+**Prototype:**
+```c
+int sys_sem_post(sem_t *sem);
+```
+Signal a semaphore.
