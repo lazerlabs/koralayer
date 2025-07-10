@@ -1,6 +1,6 @@
 # KoraLayer
 
-KoraLayer is a compatibility layer for simulating KoraOS system calls on host operating systems. This allows developing applications for KoraOS without waiting for the full kernel to be ready.
+KoraLayer is a compatibility layer for simulating KoraOS system calls on host operating systems. This allows developing applications for KoraOS without waiting for the full kernel to be ready.  The static library produced by this repository is used as the basis for **koralibc**, a minimal C library that targets KoraOS.
 
 ## Features
 
@@ -31,7 +31,7 @@ See the [docs](docs/) directory for detailed documentation.
 
 ## Building
 
-KoraLayer uses CMake as its build system. You can build the project using the provided build script or manually with CMake.
+KoraLayer uses CMake as its build system. You can build the project using the provided build script or manually with CMake.  The resulting static library `libkoralayer.a` forms the core of **koralibc**, the C standard library for KoraOS.
 
 ### Prerequisites
 
