@@ -59,6 +59,11 @@
     int linux_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
     int linux_sys_sem_wait(sem_t *sem);
     int linux_sys_sem_post(sem_t *sem);
+    int linux_sys_clock_gettime(clockid_t id, struct timespec *tp);
+    int linux_sys_gettimeofday(struct timeval *tv, void *tz);
+    int linux_sys_nanosleep(const struct timespec *req, struct timespec *rem);
+    unsigned linux_sys_sleep(unsigned seconds);
+    int linux_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
@@ -98,6 +103,11 @@
     int macos_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
     int macos_sys_sem_wait(sem_t *sem);
     int macos_sys_sem_post(sem_t *sem);
+    int macos_sys_clock_gettime(clockid_t id, struct timespec *tp);
+    int macos_sys_gettimeofday(struct timeval *tv, void *tz);
+    int macos_sys_nanosleep(const struct timespec *req, struct timespec *rem);
+    unsigned macos_sys_sleep(unsigned seconds);
+    int macos_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
@@ -137,6 +147,11 @@
     int windows_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
     int windows_sys_sem_wait(sem_t *sem);
     int windows_sys_sem_post(sem_t *sem);
+    int windows_sys_clock_gettime(clockid_t id, struct timespec *tp);
+    int windows_sys_gettimeofday(struct timeval *tv, void *tz);
+    int windows_sys_nanosleep(const struct timespec *req, struct timespec *rem);
+    unsigned windows_sys_sleep(unsigned seconds);
+    int windows_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);
