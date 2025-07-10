@@ -13,6 +13,7 @@ extern "C" {
 #include <stddef.h>  /* For size_t */
 #include <stdint.h>  /* For uint32_t, uint64_t */
 #include <sys/types.h> /* For pid_t */
+#include <semaphore.h> /* For sem_t */
 
 /**
  * System call numbers
@@ -49,6 +50,12 @@ extern "C" {
 #define SYS_GETPID     30  /* Get current process ID */
 #define SYS_GETPPID    31  /* Get parent process ID */
 #define SYS_SETPRIORITY 32 /* Set process scheduling priority */
+#define SYS_PIPE       33  /* Create a pipe */
+#define SYS_DUP        34  /* Duplicate a file descriptor */
+#define SYS_DUP2       35  /* Duplicate to a specific descriptor */
+#define SYS_SELECT     36  /* Wait for descriptor readiness */
+#define SYS_SEM_WAIT   37  /* Wait on a semaphore */
+#define SYS_SEM_POST   38  /* Post to a semaphore */
 
 /**
  * File open flags
@@ -391,6 +398,24 @@ pid_t sys_getppid(void);
 
 /** Set scheduling priority for a process */
 int sys_setpriority(pid_t pid, int prio);
+
+/** Create an anonymous pipe */
+int sys_pipe(int fds[2]);
+
+/** Duplicate a file descriptor */
+int sys_dup(int oldfd);
+
+/** Duplicate to a specific file descriptor */
+int sys_dup2(int oldfd, int newfd);
+
+/** Wait for descriptor readiness */
+int sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
+
+/** Wait on a semaphore */
+int sys_sem_wait(sem_t *sem);
+
+/** Post to a semaphore */
+int sys_sem_post(sem_t *sem);
 
 #ifdef __cplusplus
 }

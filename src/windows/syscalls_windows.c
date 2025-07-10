@@ -1,5 +1,7 @@
 #include <internal/syscall_impl.h>
 #include <sys/types.h>
+#include <semaphore.h>
+#include <sys/select.h>
 
 /**
  * Windows implementation of KoraOS system calls
@@ -111,6 +113,42 @@ pid_t windows_sys_getppid(void) {
 
 int windows_sys_setpriority(pid_t pid, int prio) {
     (void)pid; (void)prio;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_pipe(int fds[2]) {
+    (void)fds;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_dup(int oldfd) {
+    (void)oldfd;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_dup2(int oldfd, int newfd) {
+    (void)oldfd; (void)newfd;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo) {
+    (void)nfds; (void)r; (void)w; (void)e; (void)tmo;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_sem_wait(sem_t *sem) {
+    (void)sem;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_sem_post(sem_t *sem) {
+    (void)sem;
     /* TODO: Implement Windows version */
     return -1;
 }

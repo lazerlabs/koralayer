@@ -13,6 +13,8 @@
 #include <sys/mman.h>
 #include <spawn.h>
 #include <sys/wait.h>
+#include <sys/select.h>
+#include <semaphore.h>
 #include <sched.h>
 #include <sys/resource.h>
 extern char **environ;
@@ -545,6 +547,41 @@ pid_t macos_sys_getppid(void)
 int macos_sys_setpriority(pid_t pid, int prio)
 {
     return setpriority(PRIO_PROCESS, pid, prio);
+}
+
+int macos_sys_pipe(int fds[2])
+{
+    if (pipe(fds) != 0) {
+        return -1;
+    }
+    fcntl(fds[0], F_SETFL, fcntl(fds[0], F_GETFL) | O_NONBLOCK);
+    fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL) | O_NONBLOCK);
+    return 0;
+}
+
+int macos_sys_dup(int oldfd)
+{
+    return dup(oldfd);
+}
+
+int macos_sys_dup2(int oldfd, int newfd)
+{
+    return dup2(oldfd, newfd);
+}
+
+int macos_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo)
+{
+    return select(nfds, r, w, e, tmo);
+}
+
+int macos_sys_sem_wait(sem_t *sem)
+{
+    return sem_wait(sem);
+}
+
+int macos_sys_sem_post(sem_t *sem)
+{
+    return sem_post(sem);
 }
 
 #endif // KORA_PLATFORM_MACOS

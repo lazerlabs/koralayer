@@ -326,3 +326,63 @@ int sys_setpriority(pid_t pid, int prio) {
     return windows_sys_setpriority(pid, prio);
 #endif
 }
+
+int sys_pipe(int fds[2]) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_pipe(fds);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_pipe(fds);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_pipe(fds);
+#endif
+}
+
+int sys_dup(int oldfd) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_dup(oldfd);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_dup(oldfd);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_dup(oldfd);
+#endif
+}
+
+int sys_dup2(int oldfd, int newfd) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_dup2(oldfd, newfd);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_dup2(oldfd, newfd);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_dup2(oldfd, newfd);
+#endif
+}
+
+int sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_select(nfds, r, w, e, tmo);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_select(nfds, r, w, e, tmo);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_select(nfds, r, w, e, tmo);
+#endif
+}
+
+int sys_sem_wait(sem_t *sem) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_sem_wait(sem);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_sem_wait(sem);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_sem_wait(sem);
+#endif
+}
+
+int sys_sem_post(sem_t *sem) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_sem_post(sem);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_sem_post(sem);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_sem_post(sem);
+#endif
+}

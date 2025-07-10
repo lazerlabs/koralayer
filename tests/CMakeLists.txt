@@ -31,6 +31,10 @@ set(TEST_FILES
     test_mmap.c
     test_spawn.c
     test_sched.c
+    test_pipe.c
+    test_dup.c
+    test_select.c
+    test_sem.c
 )
 
 # Platform specific test configurations

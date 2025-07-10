@@ -53,6 +53,12 @@
     pid_t linux_sys_getpid(void);
     pid_t linux_sys_getppid(void);
     int linux_sys_setpriority(pid_t pid, int prio);
+    int linux_sys_pipe(int fds[2]);
+    int linux_sys_dup(int oldfd);
+    int linux_sys_dup2(int oldfd, int newfd);
+    int linux_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
+    int linux_sys_sem_wait(sem_t *sem);
+    int linux_sys_sem_post(sem_t *sem);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_exists(const char *path, uint8_t *type);
@@ -86,6 +92,12 @@
     pid_t macos_sys_getpid(void);
     pid_t macos_sys_getppid(void);
     int macos_sys_setpriority(pid_t pid, int prio);
+    int macos_sys_pipe(int fds[2]);
+    int macos_sys_dup(int oldfd);
+    int macos_sys_dup2(int oldfd, int newfd);
+    int macos_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
+    int macos_sys_sem_wait(sem_t *sem);
+    int macos_sys_sem_post(sem_t *sem);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_exists(const char *path, uint8_t *type);
@@ -119,6 +131,12 @@
     pid_t windows_sys_getpid(void);
     pid_t windows_sys_getppid(void);
     int windows_sys_setpriority(pid_t pid, int prio);
+    int windows_sys_pipe(int fds[2]);
+    int windows_sys_dup(int oldfd);
+    int windows_sys_dup2(int oldfd, int newfd);
+    int windows_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo);
+    int windows_sys_sem_wait(sem_t *sem);
+    int windows_sys_sem_post(sem_t *sem);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_exists(const char *path, uint8_t *type);
