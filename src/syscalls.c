@@ -175,6 +175,76 @@ int sys_get_fd_info(int fd, kora_file_info_t *info) {
 #endif
 }
 
+int sys_stat(const char *path, kora_stat_t *st) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_stat(path, st);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_stat(path, st);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_stat(path, st);
+#endif
+}
+
+int sys_fstat(int fd, kora_stat_t *st) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_fstat(fd, st);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_fstat(fd, st);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_fstat(fd, st);
+#endif
+}
+
+int sys_lstat(const char *path, kora_stat_t *st) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_lstat(path, st);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_lstat(path, st);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_lstat(path, st);
+#endif
+}
+
+int sys_link(const char *existing, const char *newpath) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_link(existing, newpath);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_link(existing, newpath);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_link(existing, newpath);
+#endif
+}
+
+int sys_chdir(const char *path) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_chdir(path);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_chdir(path);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_chdir(path);
+#endif
+}
+
+int sys_getcwd(char *buf, size_t size) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_getcwd(buf, size);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_getcwd(buf, size);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_getcwd(buf, size);
+#endif
+}
+
+int sys_utime(const char *path, uint64_t mtime) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_utime(path, mtime);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_utime(path, mtime);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_utime(path, mtime);
+#endif
+}
+
 int sys_exists(const char *path, uint8_t *type) {
 #if defined(KORA_PLATFORM_LINUX)
     return linux_sys_exists(path, type);
