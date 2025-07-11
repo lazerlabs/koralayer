@@ -506,3 +506,33 @@ int sys_setitimer(int which, const struct itimerval *new, struct itimerval *old)
     return windows_sys_setitimer(which, new, old);
 #endif
 }
+
+sighandler_t sys_signal(int signum, sighandler_t handler) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_signal(signum, handler);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_signal(signum, handler);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_signal(signum, handler);
+#endif
+}
+
+int sys_kill(pid_t pid, int signum) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_kill(pid, signum);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_kill(pid, signum);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_kill(pid, signum);
+#endif
+}
+
+int sys_sigreturn(void) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_sigreturn();
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_sigreturn();
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_sigreturn();
+#endif
+}

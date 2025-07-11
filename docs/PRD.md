@@ -9,7 +9,7 @@ This document outlines the remaining work required to flesh out the KoraOS C lib
 *(completed)*
 
 ## 3. Signals & Exceptions
-- Basic signal handling with `sys_signal`, `sys_kill`, and `sys_sigreturn`.
+*(completed)*
 
 ## 4. Device & Power Management (Stretch)
 - Stubs for `sys_sync`, `sys_reboot`, and `sys_mount`.

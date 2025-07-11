@@ -37,6 +37,7 @@ set(TEST_FILES
     test_sem.c
     test_time.c
     test_stat.c
+    test_signal.c
 )
 
 # Platform specific test configurations

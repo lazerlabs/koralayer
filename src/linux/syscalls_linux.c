@@ -18,6 +18,7 @@
 #include <sys/resource.h>
 #include <time.h>
 #include <sys/time.h>
+#include <signal.h>
 extern char **environ;
 
 /**
@@ -735,5 +736,20 @@ unsigned linux_sys_sleep(unsigned seconds)
 int linux_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old)
 {
     return setitimer(which, new, old);
+}
+
+sighandler_t linux_sys_signal(int signum, sighandler_t handler)
+{
+    return signal(signum, handler);
+}
+
+int linux_sys_kill(pid_t pid, int signum)
+{
+    return kill(pid, signum);
+}
+
+int linux_sys_sigreturn(void)
+{
+    return 0;
 }
 

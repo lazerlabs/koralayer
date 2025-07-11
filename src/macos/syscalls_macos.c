@@ -18,6 +18,7 @@
 #include <sched.h>
 #include <sys/resource.h>
 #include <time.h>
+#include <signal.h>
 #include <sys/time.h>
 extern char **environ;
 
@@ -733,6 +734,21 @@ unsigned macos_sys_sleep(unsigned seconds)
 int macos_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old)
 {
     return setitimer(which, new, old);
+}
+
+sighandler_t macos_sys_signal(int signum, sighandler_t handler)
+{
+    return signal(signum, handler);
+}
+
+int macos_sys_kill(pid_t pid, int signum)
+{
+    return kill(pid, signum);
+}
+
+int macos_sys_sigreturn(void)
+{
+    return 0;
 }
 
 #endif // KORA_PLATFORM_MACOS

@@ -54,5 +54,8 @@ The table below lists all system calls currently exposed by `kora/syscalls.h`. T
 | 48 | `sys_chdir` | Change current directory |
 | 49 | `sys_getcwd` | Get current working directory |
 | 50 | `sys_utime` | Update file timestamps |
+| 51 | `sys_signal` | Install a signal handler |
+| 52 | `sys_kill` | Send a signal to a process |
+| 53 | `sys_sigreturn` | Return from a signal handler |
 
 `kora/syscalls.h` also defines constants for open flags, seek modes, status codes and directory entry types.  Those are mirrored in the header and should be used when porting applications.

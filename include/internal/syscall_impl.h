@@ -64,6 +64,9 @@
     int linux_sys_nanosleep(const struct timespec *req, struct timespec *rem);
     unsigned linux_sys_sleep(unsigned seconds);
     int linux_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
+    sighandler_t linux_sys_signal(int signum, sighandler_t handler);
+    int linux_sys_kill(pid_t pid, int signum);
+    int linux_sys_sigreturn(void);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_stat(const char *path, kora_stat_t *st);
@@ -115,6 +118,9 @@
     int macos_sys_nanosleep(const struct timespec *req, struct timespec *rem);
     unsigned macos_sys_sleep(unsigned seconds);
     int macos_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
+    sighandler_t macos_sys_signal(int signum, sighandler_t handler);
+    int macos_sys_kill(pid_t pid, int signum);
+    int macos_sys_sigreturn(void);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_stat(const char *path, kora_stat_t *st);
@@ -166,6 +172,9 @@
     int windows_sys_nanosleep(const struct timespec *req, struct timespec *rem);
     unsigned windows_sys_sleep(unsigned seconds);
     int windows_sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
+    sighandler_t windows_sys_signal(int signum, sighandler_t handler);
+    int windows_sys_kill(pid_t pid, int signum);
+    int windows_sys_sigreturn(void);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_stat(const char *path, kora_stat_t *st);
