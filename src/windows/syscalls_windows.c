@@ -238,4 +238,22 @@ int windows_sys_kill(pid_t pid, int signum) {
 int windows_sys_sigreturn(void) {
     return -1;
 }
+
+int windows_sys_sync(void) {
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_reboot(int cmd) {
+    (void)cmd;
+    /* TODO: Implement Windows version */
+    return -1;
+}
+
+int windows_sys_mount(const char *src, const char *tgt, const char *type,
+                      unsigned flags, const void *data) {
+    (void)src; (void)tgt; (void)type; (void)flags; (void)data;
+    /* TODO: Implement Windows version */
+    return -1;
+}
 #endif

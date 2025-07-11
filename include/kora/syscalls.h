@@ -74,6 +74,9 @@ extern "C" {
 #define SYS_SIGNAL     51  /* Install a signal handler */
 #define SYS_KILL       52  /* Send a signal to a task */
 #define SYS_SIGRETURN  53  /* Return from signal handler */
+#define SYS_SYNC       54  /* Flush filesystem buffers */
+#define SYS_REBOOT     55  /* Reboot or power off */
+#define SYS_MOUNT      56  /* Mount a filesystem */
 
 /**
  * File open flags
@@ -496,6 +499,16 @@ int sys_kill(pid_t pid, int signum);
 
 /** Return from a signal handler */
 int sys_sigreturn(void);
+
+/** Flush filesystem buffers to disk */
+int sys_sync(void);
+
+/** Reboot or power off */
+int sys_reboot(int cmd);
+
+/** Mount a filesystem */
+int sys_mount(const char *src, const char *tgt, const char *type,
+              unsigned flags, const void *data);
 
 #ifdef __cplusplus
 }

@@ -57,5 +57,8 @@ The table below lists all system calls currently exposed by `kora/syscalls.h`. T
 | 51 | `sys_signal` | Install a signal handler |
 | 52 | `sys_kill` | Send a signal to a process |
 | 53 | `sys_sigreturn` | Return from a signal handler |
+| 54 | `sys_sync` | Flush filesystem buffers |
+| 55 | `sys_reboot` | Reboot or power off |
+| 56 | `sys_mount` | Mount a filesystem |
 
 `kora/syscalls.h` also defines constants for open flags, seek modes, status codes and directory entry types.  Those are mirrored in the header and should be used when porting applications.

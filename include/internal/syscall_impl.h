@@ -67,6 +67,10 @@
     sighandler_t linux_sys_signal(int signum, sighandler_t handler);
     int linux_sys_kill(pid_t pid, int signum);
     int linux_sys_sigreturn(void);
+    int linux_sys_sync(void);
+    int linux_sys_reboot(int cmd);
+    int linux_sys_mount(const char *src, const char *tgt, const char *type,
+                        unsigned flags, const void *data);
     int linux_sys_get_file_info(const char *path, kora_file_info_t *info);
     int linux_sys_get_fd_info(int fd, kora_file_info_t *info);
     int linux_sys_stat(const char *path, kora_stat_t *st);
@@ -121,6 +125,10 @@
     sighandler_t macos_sys_signal(int signum, sighandler_t handler);
     int macos_sys_kill(pid_t pid, int signum);
     int macos_sys_sigreturn(void);
+    int macos_sys_sync(void);
+    int macos_sys_reboot(int cmd);
+    int macos_sys_mount(const char *src, const char *tgt, const char *type,
+                        unsigned flags, const void *data);
     int macos_sys_get_file_info(const char *path, kora_file_info_t *info);
     int macos_sys_get_fd_info(int fd, kora_file_info_t *info);
     int macos_sys_stat(const char *path, kora_stat_t *st);
@@ -175,6 +183,10 @@
     sighandler_t windows_sys_signal(int signum, sighandler_t handler);
     int windows_sys_kill(pid_t pid, int signum);
     int windows_sys_sigreturn(void);
+    int windows_sys_sync(void);
+    int windows_sys_reboot(int cmd);
+    int windows_sys_mount(const char *src, const char *tgt, const char *type,
+                          unsigned flags, const void *data);
     int windows_sys_get_file_info(const char *path, kora_file_info_t *info);
     int windows_sys_get_fd_info(int fd, kora_file_info_t *info);
     int windows_sys_stat(const char *path, kora_stat_t *st);

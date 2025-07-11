@@ -12,6 +12,6 @@ This document outlines the remaining work required to flesh out the KoraOS C lib
 *(completed)*
 
 ## 4. Device & Power Management (Stretch)
-- Stubs for `sys_sync`, `sys_reboot`, and `sys_mount`.
+*(completed)*
 
 Each subsystem should be implemented in a cross‑platform manner with a Linux reference backend.  macOS and Windows shims can be added gradually as the platform code matures.
