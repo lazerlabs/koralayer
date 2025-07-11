@@ -16,6 +16,7 @@ extern "C" {
 #include <semaphore.h> /* For sem_t */
 #include <time.h>      /* For timespec */
 #include <sys/time.h>  /* For timeval */
+#include <signal.h>    /* For sighandler_t */
 
 /**
  * System call numbers
@@ -70,6 +71,9 @@ extern "C" {
 #define SYS_CHDIR      48  /* Change current directory */
 #define SYS_GETCWD     49  /* Get current working directory */
 #define SYS_UTIME      50  /* Update file timestamps */
+#define SYS_SIGNAL     51  /* Install a signal handler */
+#define SYS_KILL       52  /* Send a signal to a task */
+#define SYS_SIGRETURN  53  /* Return from signal handler */
 
 /**
  * File open flags
@@ -483,6 +487,15 @@ unsigned sys_sleep(unsigned seconds);
 
 /** Set an interval timer */
 int sys_setitimer(int which, const struct itimerval *new, struct itimerval *old);
+
+/** Install a signal handler */
+sighandler_t sys_signal(int signum, sighandler_t handler);
+
+/** Send a signal to a process or group */
+int sys_kill(pid_t pid, int signum);
+
+/** Return from a signal handler */
+int sys_sigreturn(void);
 
 #ifdef __cplusplus
 }

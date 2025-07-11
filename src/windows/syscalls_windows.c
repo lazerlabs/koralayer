@@ -224,4 +224,18 @@ int windows_sys_setitimer(int which, const struct itimerval *new, struct itimerv
     (void)which; (void)new; (void)old;
     return -1;
 }
+
+sighandler_t windows_sys_signal(int signum, sighandler_t handler) {
+    (void)signum; (void)handler;
+    return SIG_ERR;
+}
+
+int windows_sys_kill(pid_t pid, int signum) {
+    (void)pid; (void)signum;
+    return -1;
+}
+
+int windows_sys_sigreturn(void) {
+    return -1;
+}
 #endif
