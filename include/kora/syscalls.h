@@ -63,6 +63,13 @@ extern "C" {
 #define SYS_NANOSLEEP  41  /* Sleep for nanoseconds */
 #define SYS_SLEEP      42  /* Sleep for seconds */
 #define SYS_SETITIMER  43  /* Set interval timer */
+#define SYS_STAT       44  /* Get file status by path */
+#define SYS_FSTAT      45  /* Get file status by descriptor */
+#define SYS_LSTAT      46  /* Get link status without following */
+#define SYS_LINK       47  /* Create a hard link */
+#define SYS_CHDIR      48  /* Change current directory */
+#define SYS_GETCWD     49  /* Get current working directory */
+#define SYS_UTIME      50  /* Update file timestamps */
 
 /**
  * File open flags
@@ -133,6 +140,17 @@ typedef struct {
     uint64_t modified_time;      /* Last modification time (UNIX timestamp) */
     uint64_t access_time;        /* Last access time (UNIX timestamp) */
 } kora_file_info_t;
+
+/**
+ * Simplified file status structure used by sys_stat family
+ */
+typedef struct {
+    uint32_t mode;    /* File mode and type */
+    uint64_t size;    /* Size in bytes */
+    uint64_t mtime;   /* Modification time (UNIX timestamp) */
+    uint32_t uid;     /* Owning user ID */
+    uint32_t gid;     /* Owning group ID */
+} kora_stat_t;
 
 /**
  * File attribute flags
@@ -297,6 +315,21 @@ int sys_get_file_info(const char *path, kora_file_info_t *info);
 int sys_get_fd_info(int fd, kora_file_info_t *info);
 
 /**
+ * Get file status information by path
+ */
+int sys_stat(const char *path, kora_stat_t *st);
+
+/**
+ * Get file status information by descriptor
+ */
+int sys_fstat(int fd, kora_stat_t *st);
+
+/**
+ * Get file status without following symlinks
+ */
+int sys_lstat(const char *path, kora_stat_t *st);
+
+/**
  * Check if a path exists
  * 
  * @param path Path to check
@@ -319,6 +352,18 @@ int sys_unlink(const char *path);
  * @return 0 on success, negative error code on failure
  */
 int sys_rename(const char *oldpath, const char *newpath);
+
+/** Create a hard link to a file */
+int sys_link(const char *existing, const char *newpath);
+
+/** Change the current working directory */
+int sys_chdir(const char *path);
+
+/** Retrieve the current working directory into buf */
+int sys_getcwd(char *buf, size_t size);
+
+/** Update access and modification times */
+int sys_utime(const char *path, uint64_t mtime);
 
 /**
  * Set the program break to a specific address

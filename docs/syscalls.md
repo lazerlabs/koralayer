@@ -47,5 +47,12 @@ The table below lists all system calls currently exposed by `kora/syscalls.h`. T
 | 41 | `sys_nanosleep` | Sleep for nanoseconds |
 | 42 | `sys_sleep` | Sleep for seconds |
 | 43 | `sys_setitimer` | Set an interval timer |
+| 44 | `sys_stat` | Get file status by path |
+| 45 | `sys_fstat` | Get file status by descriptor |
+| 46 | `sys_lstat` | Get file status without following symlinks |
+| 47 | `sys_link` | Create a hard link |
+| 48 | `sys_chdir` | Change current directory |
+| 49 | `sys_getcwd` | Get current working directory |
+| 50 | `sys_utime` | Update file timestamps |
 
 `kora/syscalls.h` also defines constants for open flags, seek modes, status codes and directory entry types.  Those are mirrored in the header and should be used when porting applications.
