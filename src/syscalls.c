@@ -536,3 +536,34 @@ int sys_sigreturn(void) {
     return windows_sys_sigreturn();
 #endif
 }
+
+int sys_sync(void) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_sync();
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_sync();
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_sync();
+#endif
+}
+
+int sys_reboot(int cmd) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_reboot(cmd);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_reboot(cmd);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_reboot(cmd);
+#endif
+}
+
+int sys_mount(const char *src, const char *tgt, const char *type,
+              unsigned flags, const void *data) {
+#if defined(KORA_PLATFORM_LINUX)
+    return linux_sys_mount(src, tgt, type, flags, data);
+#elif defined(KORA_PLATFORM_MACOS)
+    return macos_sys_mount(src, tgt, type, flags, data);
+#elif defined(KORA_PLATFORM_WINDOWS)
+    return windows_sys_mount(src, tgt, type, flags, data);
+#endif
+}

@@ -751,4 +751,29 @@ int macos_sys_sigreturn(void)
     return 0;
 }
 
+int macos_sys_sync(void)
+{
+    sync();
+    return 0;
+}
+
+int macos_sys_reboot(int cmd)
+{
+    (void)cmd;
+    errno = ENOSYS;
+    return -1;
+}
+
+int macos_sys_mount(const char *src, const char *tgt, const char *type,
+                    unsigned flags, const void *data)
+{
+    (void)src;
+    (void)tgt;
+    (void)type;
+    (void)flags;
+    (void)data;
+    errno = ENOSYS;
+    return -1;
+}
+
 #endif // KORA_PLATFORM_MACOS
