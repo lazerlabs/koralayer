@@ -420,6 +420,114 @@ int macos_sys_get_fd_info(int fd, kora_file_info_t *info)
     return 0;
 }
 
+int macos_sys_stat(const char *path, kora_stat_t *st)
+{
+    if (!path || !st) {
+        return -EINVAL;
+    }
+
+    struct stat host;
+    if (stat(path, &host) != 0) {
+        return -errno;
+    }
+
+    st->mode = host.st_mode;
+    st->size = host.st_size;
+    st->mtime = host.st_mtime;
+    st->uid = 0;
+    st->gid = 0;
+
+    return 0;
+}
+
+int macos_sys_fstat(int fd, kora_stat_t *st)
+{
+    if (fd < 0 || !st) {
+        return -EINVAL;
+    }
+
+    struct stat host;
+    if (fstat(fd, &host) != 0) {
+        return -errno;
+    }
+
+    st->mode = host.st_mode;
+    st->size = host.st_size;
+    st->mtime = host.st_mtime;
+    st->uid = 0;
+    st->gid = 0;
+
+    return 0;
+}
+
+int macos_sys_lstat(const char *path, kora_stat_t *st)
+{
+    if (!path || !st) {
+        return -EINVAL;
+    }
+
+    struct stat host;
+    if (lstat(path, &host) != 0) {
+        return -errno;
+    }
+
+    st->mode = host.st_mode;
+    st->size = host.st_size;
+    st->mtime = host.st_mtime;
+    st->uid = 0;
+    st->gid = 0;
+
+    return 0;
+}
+
+int macos_sys_link(const char *existing, const char *newpath)
+{
+    if (!existing || !newpath) {
+        return -EINVAL;
+    }
+    if (link(existing, newpath) != 0) {
+        return -errno;
+    }
+    return 0;
+}
+
+int macos_sys_chdir(const char *path)
+{
+    if (!path) {
+        return -EINVAL;
+    }
+    if (chdir(path) != 0) {
+        return -errno;
+    }
+    return 0;
+}
+
+int macos_sys_getcwd(char *buf, size_t size)
+{
+    if (!buf || size == 0) {
+        return -EINVAL;
+    }
+    if (getcwd(buf, size) == NULL) {
+        return -errno;
+    }
+    return 0;
+}
+
+int macos_sys_utime(const char *path, uint64_t mtime)
+{
+    if (!path) {
+        return -EINVAL;
+    }
+    struct timeval tv[2];
+    tv[0].tv_sec = (time_t)mtime;
+    tv[0].tv_usec = 0;
+    tv[1] = tv[0];
+    if (utimes(path, tv) != 0) {
+        return -errno;
+    }
+    return 0;
+}
+
 /**
  * Check if a path exists and determine its type
  */
@@ -470,6 +578,20 @@ int macos_sys_unlink(const char *path)
         return -errno;
     }
     
+    return 0;
+}
+
+/**
+ * Rename a file or directory
+ */
+int macos_sys_rename(const char *oldpath, const char *newpath)
+{
+    if (!oldpath || !newpath) {
+        return -EINVAL;
+    }
+    if (rename(oldpath, newpath) != 0) {
+        return -errno;
+    }
     return 0;
 }
 

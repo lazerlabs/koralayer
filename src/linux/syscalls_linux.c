@@ -413,6 +413,114 @@ int linux_sys_get_fd_info(int fd, kora_file_info_t *info)
     return 0;
 }
 
+int linux_sys_stat(const char *path, kora_stat_t *st)
+{
+    if (!path || !st) {
+        return -EINVAL;
+    }
+
+    struct stat host;
+    if (stat(path, &host) != 0) {
+        return -errno;
+    }
+
+    st->mode = host.st_mode;
+    st->size = host.st_size;
+    st->mtime = host.st_mtime;
+    st->uid = 0;
+    st->gid = 0;
+
+    return 0;
+}
+
+int linux_sys_fstat(int fd, kora_stat_t *st)
+{
+    if (fd < 0 || !st) {
+        return -EINVAL;
+    }
+
+    struct stat host;
+    if (fstat(fd, &host) != 0) {
+        return -errno;
+    }
+
+    st->mode = host.st_mode;
+    st->size = host.st_size;
+    st->mtime = host.st_mtime;
+    st->uid = 0;
+    st->gid = 0;
+
+    return 0;
+}
+
+int linux_sys_lstat(const char *path, kora_stat_t *st)
+{
+    if (!path || !st) {
+        return -EINVAL;
+    }
+
+    struct stat host;
+    if (lstat(path, &host) != 0) {
+        return -errno;
+    }
+
+    st->mode = host.st_mode;
+    st->size = host.st_size;
+    st->mtime = host.st_mtime;
+    st->uid = 0;
+    st->gid = 0;
+
+    return 0;
+}
+
+int linux_sys_link(const char *existing, const char *newpath)
+{
+    if (!existing || !newpath) {
+        return -EINVAL;
+    }
+    if (link(existing, newpath) != 0) {
+        return -errno;
+    }
+    return 0;
+}
+
+int linux_sys_chdir(const char *path)
+{
+    if (!path) {
+        return -EINVAL;
+    }
+    if (chdir(path) != 0) {
+        return -errno;
+    }
+    return 0;
+}
+
+int linux_sys_getcwd(char *buf, size_t size)
+{
+    if (!buf || size == 0) {
+        return -EINVAL;
+    }
+    if (getcwd(buf, size) == NULL) {
+        return -errno;
+    }
+    return 0;
+}
+
+int linux_sys_utime(const char *path, uint64_t mtime)
+{
+    if (!path) {
+        return -EINVAL;
+    }
+    struct timespec times[2];
+    times[0].tv_sec = (time_t)mtime;
+    times[0].tv_nsec = 0;
+    times[1] = times[0];
+    if (utimensat(AT_FDCWD, path, times, 0) != 0) {
+        return -errno;
+    }
+    return 0;
+}
+
 /**
  * Check if a path exists and determine its type
  */

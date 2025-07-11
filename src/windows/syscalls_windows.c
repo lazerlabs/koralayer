@@ -137,6 +137,51 @@ int windows_sys_dup2(int oldfd, int newfd) {
     return -1;
 }
 
+int windows_sys_stat(const char *path, kora_stat_t *st) {
+    (void)path; (void)st;
+    return -1;
+}
+
+int windows_sys_fstat(int fd, kora_stat_t *st) {
+    (void)fd; (void)st;
+    return -1;
+}
+
+int windows_sys_lstat(const char *path, kora_stat_t *st) {
+    (void)path; (void)st;
+    return -1;
+}
+
+int windows_sys_link(const char *existing, const char *newpath) {
+    (void)existing; (void)newpath;
+    return -1;
+}
+
+int windows_sys_unlink(const char *path) {
+    (void)path;
+    return -1;
+}
+
+int windows_sys_rename(const char *oldpath, const char *newpath) {
+    (void)oldpath; (void)newpath;
+    return -1;
+}
+
+int windows_sys_chdir(const char *path) {
+    (void)path;
+    return -1;
+}
+
+int windows_sys_getcwd(char *buf, size_t size) {
+    (void)buf; (void)size;
+    return -1;
+}
+
+int windows_sys_utime(const char *path, uint64_t mtime) {
+    (void)path; (void)mtime;
+    return -1;
+}
+
 int windows_sys_select(int nfds, fd_set *r, fd_set *w, fd_set *e, struct timeval *tmo) {
     (void)nfds; (void)r; (void)w; (void)e; (void)tmo;
     /* TODO: Implement Windows version */
